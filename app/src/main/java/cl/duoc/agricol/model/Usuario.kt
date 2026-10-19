@@ -5,7 +5,7 @@ data class Usuario(val id: UUID = UUID.randomUUID(),
                     val celular: Int,
                     val correo:String,
                     val contraseña:String,
-                    val rut:Int,
+                    val rut:String,
                     val nro_documento:String
 
 ){
