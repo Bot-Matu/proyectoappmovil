@@ -1,7 +1,9 @@
 package cl.duoc.agricol.model
+import androidx.room.Entity
 import java.util.UUID
 import java.util.Date
 import cl.duoc.agricol.model.Usuario
+@Entity(tableName = "publicacion")
 data class Publicacion(val id: UUID = UUID.randomUUID(),
     val titulo:String,
     val comuna:String,
