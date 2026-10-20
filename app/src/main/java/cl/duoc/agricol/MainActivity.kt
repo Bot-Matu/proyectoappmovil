@@ -17,19 +17,21 @@ import cl.duoc.agricol.ui.theme.AgricolTheme
 import cl.duoc.agricol.ui.theme.Login
 import androidx.compose.foundation.layout.fillMaxSize
 import cl.duoc.agricol.ui.theme.Inicio
+import cl.duoc.agricol.ui.theme.Register
+import cl.duoc.agricol.ui.theme.RegisterPart2
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // MaterialTheme aplica los estilos y colores por defecto de Material 3
+
             MaterialTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    Login()
+                    RegisterPart2()
 
                 }
             }
