@@ -7,6 +7,7 @@ import androidx.room.*
 @Dao
 interface PublicacionesDao {
 
+    @Query("SELECT * FROM publicacion LIMIT 3")
     suspend fun getAll(): List<Publicacion>
 
     @Insert

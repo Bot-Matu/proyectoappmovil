@@ -1,6 +1,6 @@
 package cl.duoc.agricol.model
-import java.util.UUID
-data class Usuario(val id: UUID,
+
+data class Usuario(val id: Int,
                     val nombre: String,
                     val celular: Int,
                     val correo:String,

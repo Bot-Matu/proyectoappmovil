@@ -4,15 +4,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import cl.duoc.agricol.model.Usuario
-import java.util.UUID
+
 
 object UsuarioRepository {
     private var lista_usuarios by mutableStateOf(listOf<Usuario>())
     val usuarios: List<Usuario> get() = lista_usuarios
-
+    private var rotation_Id = 1
 
     fun crearNuevoUsuario(
-        id: UUID = UUID.randomUUID(),
+        id: Int,
         nombre: String,
         telefono: Int,
         correo: String,
@@ -22,7 +22,7 @@ object UsuarioRepository {
 
     ): Usuario {
         val usuario = Usuario(
-            id = id,
+            id = rotation_Id++,
             nombre = nombre,
             celular = telefono,
             correo = correo,
