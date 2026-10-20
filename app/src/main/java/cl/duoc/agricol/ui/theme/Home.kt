@@ -28,7 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
-// En Material 3, TopAppBar a veces requiere esta anotación experimental dependiendo de tu versión
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home() {
@@ -37,20 +37,20 @@ fun Home() {
     val iconos = listOf(Icons.Default.Home, Icons.Default.Search, Icons.Default.Message, Icons.Default.Person)
 
     Scaffold(
-        // 1. BARRA SUPERIOR
+
         topBar = {
             TopAppBar(
-                title = { Text("Agricolab") }, // Nombre de la app a la izquierda
+                title = { Text("Agricolab") },
                 actions = {
                     // Botón de "+" (Crear)
-                    IconButton(onClick = { /* Acción para crear algo nuevo */ }) {
+                    IconButton(onClick = { /* aqui se manda a crear una nueva notificacion */ }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Crear nuevo"
                         )
                     }
-                    // Botón de Notificaciones
-                    IconButton(onClick = { /* Acción de notificaciones */ }) {
+
+                    IconButton(onClick = {/*aqui se agrega lo que vaya en notificaciones o lo que quieres que haga el boton*/  }) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
                             contentDescription = "Ver notificaciones"
@@ -59,7 +59,7 @@ fun Home() {
                 }
             )
         },
-        // 2. BARRA INFERIOR (Menú de navegación)
+
         bottomBar = {
             NavigationBar {
                 titulos.forEachIndexed { index, titulo ->
@@ -73,14 +73,13 @@ fun Home() {
             }
         }
     ) { paddingValues ->
-        // 3. CONTENIDO CENTRAL
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues), // Vital para que no se tape con las barras
+                .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Estás en la pestaña: ${titulos[itemSeleccionado]}")
+            //aqui va lo del medio
         }
     }
 }

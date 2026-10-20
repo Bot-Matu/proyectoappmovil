@@ -1,6 +1,6 @@
 package cl.duoc.agricol.model
 import java.util.UUID
-data class Usuario(val id: UUID = UUID.randomUUID(),
+data class Usuario(val id: UUID,
                     val nombre: String,
                     val celular: Int,
                     val correo:String,
