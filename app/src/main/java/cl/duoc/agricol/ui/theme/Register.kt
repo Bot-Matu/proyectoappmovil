@@ -22,10 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import cl.duoc.agricol.ui.theme.Inicio
 
 @Composable
-fun Register(){
+fun Register(navController: NavController){
 
     var nombre by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
@@ -35,7 +36,9 @@ fun Register(){
     var modal by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(36.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(36.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
 
@@ -43,7 +46,9 @@ fun Register(){
         Text(text="Registro")
     }
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
 
@@ -124,6 +129,10 @@ fun Register(){
         ) {
             Text(text = "Continuar")
 
+        }
+
+        Button(onClick = { navController.navigate("login") }) {
+            Text("Ya tienes cuenta? Haz click aquí")
         }
 
 

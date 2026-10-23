@@ -83,12 +83,9 @@ fun Login(navController: NavController){
 
         Spacer(modifier = Modifier.height(62.dp))
 
-        Text(
-            text = "¿No tienes cuenta? Registrate Aquí",
-            modifier = Modifier.clickable {
-                println("Clic registrado")
-            }
-        )
+        Button(onClick = { navController.navigate("register") }) {
+            Text("No tienes cuenta? Registrate aquí")
+        }
 
         Spacer(modifier = Modifier.height(72.dp))
 

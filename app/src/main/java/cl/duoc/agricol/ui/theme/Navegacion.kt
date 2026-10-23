@@ -25,22 +25,20 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun Navegacion() {
     val navController = rememberNavController()
-    NavHost(navController, startDestination = "pagina1") {
-        composable("pagina1") { Pagina1(navController) }
-        composable("pagina2") { Pagina2(navController) }
+    NavHost(navController, startDestination = "register") {
+        composable("register") { Register(navController) }
         composable("login") { Login(navController) }
     }
 }
 
 @Composable
-fun Pagina1(navController: NavController) {
+fun registrado(navController: NavController) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Página Número Uno")
-        Text("8 de agosto, día del gato")
+
 
         Button(onClick = { navController.navigate("login") }) {
             Text("Ir a la página 2")
@@ -48,17 +46,3 @@ fun Pagina1(navController: NavController) {
     }
 }
 
-@Composable
-fun Pagina2(navController: NavController) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Bienvenido a la página 2")
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { navController.navigate("pagina1") }) {
-            Text("Ir a la primera página")
-        }
-    }
-}
