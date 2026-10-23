@@ -9,6 +9,7 @@ import cl.duoc.agricol.model.Usuario
 object UsuarioRepository {
     private var lista_usuarios by mutableStateOf(listOf<Usuario>())
     val usuarios: List<Usuario> get() = lista_usuarios
+    val usuarios_registrados: MutableList<Usuario> get() = usuarios_registrados
     private var rotation_Id = 1
 
     fun crearNuevoUsuario(
@@ -35,5 +36,6 @@ object UsuarioRepository {
     }
 
     fun obtenerUsuarios(): List<Usuario> = usuarios
+
 
 }

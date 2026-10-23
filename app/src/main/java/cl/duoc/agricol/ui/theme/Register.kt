@@ -123,12 +123,8 @@ fun Register(navController: NavController){
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = { modal = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Continuar")
-
+        Button(onClick = { navController.navigate("register2") }) {
+            Text("Continuar")
         }
 
         Button(onClick = { navController.navigate("login") }) {

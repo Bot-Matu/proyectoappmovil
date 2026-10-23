@@ -20,10 +20,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import cl.duoc.agricol.ui.theme.Inicio
 
 @Composable
-fun RegisterPart2(){
+fun RegisterPart2(navController: NavController){
 
     var rut by remember { mutableStateOf("") }
     var nro_documento by remember { mutableStateOf("") }
@@ -57,7 +58,7 @@ fun RegisterPart2(){
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "nro_documento")
+        Text(text = "Nro Documento")
 
         OutlinedTextField(
             value = nro_documento,

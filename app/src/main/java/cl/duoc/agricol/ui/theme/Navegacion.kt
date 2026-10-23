@@ -28,6 +28,8 @@ fun Navegacion() {
     NavHost(navController, startDestination = "register") {
         composable("register") { Register(navController) }
         composable("login") { Login(navController) }
+        composable("home") { Home(navController) }
+        composable("register2") { RegisterPart2(navController) }
     }
 }
 

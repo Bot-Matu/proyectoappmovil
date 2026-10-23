@@ -24,6 +24,7 @@ import cl.duoc.agricol.ui.theme.Home
 import cl.duoc.agricol.ui.theme.Navegacion
 
 class MainActivity : ComponentActivity() {
+    //poner aca lo que el profe tiene en main
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

@@ -29,11 +29,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
-    onCerrarSesion: () -> Unit = {}
+
+            navController: NavController
 ) {
     var itemSeleccionado by remember { mutableIntStateOf(0) }
     val titulos = listOf("Inicio", "Buscar", "Mensajes", "Perfil")
@@ -91,7 +93,7 @@ fun Home(
                 0 -> PestanaInicio()
                 1 -> PestanaBuscar()
                 2 -> PestanaMensajes()
-                3 -> PestanaPerfil(onCerrarSesion = onCerrarSesion)
+
             }
         }
     }

@@ -73,12 +73,8 @@ fun Login(navController: NavController){
 
         Spacer(modifier = Modifier.height(42.dp))
 
-        Button(
-            onClick = { modal = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Ingresar")
-
+        Button(onClick = { navController.navigate("home") }) {
+            Text("Ingresar")
         }
 
         Spacer(modifier = Modifier.height(62.dp))
