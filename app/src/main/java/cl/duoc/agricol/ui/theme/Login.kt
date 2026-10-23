@@ -22,10 +22,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import cl.duoc.agricol.ui.theme.Inicio
 
 @Composable
-fun Login(){
+fun Login(navController: NavController){
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }

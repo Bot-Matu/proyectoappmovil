@@ -16,7 +16,7 @@ object UsuarioRepository {
         nombre: String,
         telefono: Int,
         correo: String,
-        contraseña:String,
+        contrasena:String,
         rut:String,
         nro_documento:String
 
@@ -26,7 +26,7 @@ object UsuarioRepository {
             nombre = nombre,
             celular = telefono,
             correo = correo,
-            contraseña=contraseña,
+            contrasena=contrasena,
             rut=rut,
             nro_documento=nro_documento
         )

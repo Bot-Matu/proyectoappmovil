@@ -21,6 +21,8 @@ import cl.duoc.agricol.ui.theme.Inicio
 import cl.duoc.agricol.ui.theme.Register
 import cl.duoc.agricol.ui.theme.RegisterPart2
 import cl.duoc.agricol.ui.theme.Home
+import cl.duoc.agricol.ui.theme.Navegacion
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +34,8 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    Home()
+                    //Home()
+                    Navegacion()
 
                 }
             }

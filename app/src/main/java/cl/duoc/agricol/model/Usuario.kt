@@ -1,10 +1,16 @@
 package cl.duoc.agricol.model
 
-data class Usuario(val id: Int,
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "usuarios")
+data class Usuario(
+                     @PrimaryKey
+                    val id: Int,
                     val nombre: String,
                     val celular: Int,
                     val correo:String,
-                    val contraseña:String,
+                    val contrasena:String,
                     val rut:String,
                     val nro_documento:String
 
