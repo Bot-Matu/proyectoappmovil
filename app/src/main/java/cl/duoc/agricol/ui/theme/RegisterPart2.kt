@@ -28,6 +28,7 @@ fun RegisterPart2(navController: NavController){
 
     var rut by remember { mutableStateOf("") }
     var nro_documento by remember { mutableStateOf("") }
+
     var modal by remember { mutableStateOf(false) }
 
     Column(

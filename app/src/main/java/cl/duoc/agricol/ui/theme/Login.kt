@@ -30,6 +30,7 @@ fun Login(navController: NavController){
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var registrado by remember { mutableStateOf(true) }
     var modal by remember { mutableStateOf(false) }
 
     Column(
