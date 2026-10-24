@@ -1,39 +1,14 @@
 package cl.duoc.agricol.repository
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import cl.duoc.agricol.model.Usuario
 
+class UsuarioRepository(private val usuarioDao: UsuarioDao) {
 
-object UsuarioRepository {
-    private var lista_usuarios by mutableStateOf(listOf<Usuario>())
-    val usuarios: List<Usuario> get() = lista_usuarios
-    private var rotation_Id = 1
+    suspend fun registrar(usuario: Usuario) = usuarioDao.insertar(usuario)
 
-    fun crearNuevoUsuario(
-        id: Int,
-        nombre: String,
-        telefono: Int,
-        correo: String,
-        contraseña:String,
-        rut:String,
-        nro_documento:String
+    suspend fun iniciarSesion(rut: String, password: String): Usuario? =
+        usuarioDao.iniciarSesion(rut, password)
 
-    ): Usuario {
-        val usuario = Usuario(
-            id = rotation_Id++,
-            nombre = nombre,
-            celular = telefono,
-            correo = correo,
-            contraseña=contraseña,
-            rut=rut,
-            nro_documento=nro_documento
-        )
-        lista_usuarios = lista_usuarios + usuario
-        return usuario
-    }
-
-    fun obtenerUsuarios(): List<Usuario> = usuarios
-
+    suspend fun existeRut(rut: String): Boolean =
+        usuarioDao.buscarPorRut(rut) != null
 }
