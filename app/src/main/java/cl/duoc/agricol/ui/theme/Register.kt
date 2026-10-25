@@ -151,7 +151,7 @@ fun Register(navController: NavController) {
 // Esta función dibuja UN campo: etiqueta azul + caja de texto con línea abajo.
 // Los parámetros son lo único que cambia entre un campo y otro.
 @Composable
-private fun CampoRegistro(
+fun CampoRegistro(
     etiqueta: String,
     valor: String,
     alCambiar: (String) -> Unit,
