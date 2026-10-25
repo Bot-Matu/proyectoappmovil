@@ -25,7 +25,7 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun Navegacion() {
     val navController = rememberNavController()
-    NavHost(navController, startDestination = "register") {
+    NavHost(navController, startDestination = "login") {
         composable("register") { Register(navController) }
         composable("login") { Login(navController) }
         composable("home") { Home(navController) }
