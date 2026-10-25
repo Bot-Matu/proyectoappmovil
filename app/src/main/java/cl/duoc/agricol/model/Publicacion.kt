@@ -6,16 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "publicacion",
-    foreignKeys = [
-        ForeignKey(
-            entity = Usuario::class,
-            parentColumns = ["id"],
-            childColumns = ["creadorId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
-    indices = [Index("creadorId")]
+    tableName = "publicacion"
 )
 data class Publicacion(
     @PrimaryKey(autoGenerate = true)
