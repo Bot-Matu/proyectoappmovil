@@ -14,11 +14,11 @@ data class Publicacion(
     val titulo: String,
     val comuna: String,
     val ciudad: String,
-    val fecha_inicio: Long,      // milisegundos (Date.time)
-    val fecha_termino: Long,     // milisegundos (Date.time)
+    val fecha_inicio: Long,
+    val fecha_termino: Long,
     val tra_necesitados: Int,
     val descripcion: String,
     val info_extra: String,
     val paga: Double,
-    val creadorId: Int           // id del Usuario que creó la publicación
+    val creadorId: Int
 )
