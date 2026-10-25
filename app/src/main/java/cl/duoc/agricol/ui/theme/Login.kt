@@ -28,7 +28,7 @@ import androidx.navigation.NavController
 @Composable
 fun Login(navController: NavController){
 
-    var username by remember { mutableStateOf("") }
+    var rut by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var registrado by remember { mutableStateOf(true) }
     var modal by remember { mutableStateOf(false) }
@@ -51,9 +51,9 @@ fun Login(navController: NavController){
         Text(text = "RUT")
 
         OutlinedTextField(
-            value = username,
+            value = rut,
             onValueChange = { nuevoTexto ->
-                username = nuevoTexto
+                rut = nuevoTexto
             },
             label = { Text("Introduce tu RUT") },
             modifier = Modifier.fillMaxWidth()
@@ -98,7 +98,7 @@ fun Login(navController: NavController){
             AlertDialog(
                 onDismissRequest = { modal = false },
                 title = { Text("Mensaje") },
-                text = { Text("Se debe crear el usuario: $username con la contraseña:$password") },
+                text = { Text("Se debe crear el usuario: $rut con la contraseña:$password") },
                 confirmButton = {
                     Button(onClick = { modal = false }) {
                         Text("OK")
