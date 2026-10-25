@@ -5,7 +5,7 @@ data class UsuarioForm (
     var correo: String = "",
     var celular: Int? = null,
     var contrasena:String="",
-    var rep_contrasena:String="",
+    var rep_contrasena:String?="",
     var rut:String="",
     var nro_Documento:String="",
     var terminos: Boolean = false
