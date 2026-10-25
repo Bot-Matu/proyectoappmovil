@@ -2,20 +2,18 @@ package cl.duoc.agricol.repository
 import cl.duoc.agricol.model.Publicacion
 import androidx.room.*
 
-
-
 @Dao
 interface PublicacionesDao {
 
     @Query("SELECT * FROM publicacion LIMIT 3")
-    suspend fun getAll(): List<Publicacion>
+    fun getAll(): List<Publicacion>
 
     @Insert
-    suspend fun insert(publicacion:Publicacion)
+    fun insert(publicacion: Publicacion): Long
 
     @Update
-    suspend fun update(publicacion:Publicacion)
+    fun update(publicacion: Publicacion): Int
 
     @Delete
-    suspend fun delete(publicacion:Publicacion)
+    fun delete(publicacion: Publicacion): Int
 }

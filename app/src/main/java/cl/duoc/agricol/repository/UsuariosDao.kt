@@ -2,17 +2,18 @@ package cl.duoc.agricol.repository
 
 import cl.duoc.agricol.model.Usuario
 import androidx.room.*
+
 @Dao
 interface UsuariosDao {
     @Query("SELECT * FROM usuarios")
-    suspend fun getAll(): List<Usuario>
+    fun getAll(): List<Usuario>
 
     @Insert
-    suspend fun insert(usuario:Usuario)
+    fun insert(usuario: Usuario): Long
 
     @Update
-    suspend fun update(usuario:Usuario)
+    fun update(usuario: Usuario): Int
 
     @Delete
-    suspend fun delete(usuario: Usuario)
+    fun delete(usuario: Usuario): Int
 }

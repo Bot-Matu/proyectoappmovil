@@ -9,12 +9,11 @@ import cl.duoc.agricol.model.Usuario
 interface UsuarioDao {
 
     @Insert
-    suspend fun insertar(usuario: Usuario)
+    fun insertar(usuario: Usuario): Long
 
-    // Devuelve el usuario si el RUT y la contraseña coinciden; si no, null
     @Query("SELECT * FROM usuario WHERE rut = :rut AND password = :password LIMIT 1")
-    suspend fun iniciarSesion(rut: String, password: String): Usuario?
+    fun iniciarSesion(rut: String, password: String): Usuario?
 
     @Query("SELECT * FROM usuario WHERE rut = :rut LIMIT 1")
-    suspend fun buscarPorRut(rut: String): Usuario?
+    fun buscarPorRut(rut: String): Usuario?
 }
