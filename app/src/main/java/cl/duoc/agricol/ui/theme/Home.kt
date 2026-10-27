@@ -97,40 +97,12 @@ fun Home(
                 0 -> PantallaInicio()
                 1 -> PantallaBuscar()
                 2 -> PantallaMensajes()
-                3 -> PantallaPerfil()
+                3 -> PantallaPerfil(onCerrarSesion = { navController.navigate("login") })
 
             }
         }
     }
 }
 
-@Composable
-private fun PantallaInicio() {
 
-    Text("Publicaciones")
-}
 
-@Composable
-private fun PantallaBuscar() {
-
-    Text("Buscar")
-}
-
-@Composable
-private fun PestanaMensajes() {
-
-    Text("Mensajes")
-}
-
-@Composable
-private fun PestanaPerfil(onCerrarSesion: () -> Unit) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Perfil")
-        Button(onClick = onCerrarSesion) {
-            Text("Cerrar sesión")
-        }
-    }
-}

@@ -3,41 +3,38 @@ package cl.duoc.agricol
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import cl.duoc.agricol.ui.theme.AgricolTheme
-import cl.duoc.agricol.ui.theme.Login
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.input.key.Key.Companion.Home
-import cl.duoc.agricol.ui.theme.Inicio
-import cl.duoc.agricol.ui.theme.Register
-import cl.duoc.agricol.ui.theme.RegisterPart2
-import cl.duoc.agricol.ui.theme.Home
+import androidx.room.Room
+import cl.duoc.agricol.repository.AppDatabase
+import cl.duoc.agricol.repository.UsuarioRepository
 import cl.duoc.agricol.ui.theme.Navegacion
+import cl.duoc.agricol.viewmodel.UsuarioViewModel
 
 class MainActivity : ComponentActivity() {
-    //poner aca lo que el profe tiene en main
+
+    // Crea la base de datos de Room
+    private val db by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "agricolab_db"
+        ).build()
+    }
+    private val usuarioRepository by lazy { UsuarioRepository(db.usuariosDao()) }
+    private val usuarioViewModel by lazy { UsuarioViewModel(usuarioRepository) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
             MaterialTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
-                    //Home()
-                    Navegacion()
-
+                    Navegacion(usuarioViewModel)
                 }
             }
         }

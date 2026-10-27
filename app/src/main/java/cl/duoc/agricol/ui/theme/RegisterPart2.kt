@@ -39,13 +39,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import cl.duoc.agricol.ui.theme.Inicio
+import androidx.compose.runtime.collectAsState
+import cl.duoc.agricol.viewmodel.UsuarioViewModel
 
 @Composable
-fun RegisterPart2(navController: NavController){
+fun RegisterPart2(navController: NavController, viewModel: UsuarioViewModel) {
 
-    var rut by remember { mutableStateOf("") }
-    var nro_documento by remember { mutableStateOf("") }
-    var modal by remember { mutableStateOf(false) }
+    val form by viewModel.form.collectAsState()
+    val errors by viewModel.errors.collectAsState()
+    val mensajeModal by viewModel.mensajeModal.collectAsState()
+    val registroExitoso by viewModel.registroExitoso.collectAsState()
 
     Column(
         modifier = Modifier
@@ -53,14 +56,13 @@ fun RegisterPart2(navController: NavController){
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.Start
-
-    ){
+    ) {
 
         Spacer(modifier = Modifier.height(64.dp))
 
-        Row(verticalAlignment = Alignment.CenterVertically){
+        Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
-                onClick = {navController.popBackStack()},
+                onClick = { navController.popBackStack() },
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
@@ -79,55 +81,59 @@ fun RegisterPart2(navController: NavController){
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
-
         }
 
         Spacer(modifier = Modifier.height(40.dp))
 
         CampoRegistro(
             etiqueta = "R.U.T",
-            valor = rut,
-            alCambiar = { rut = it },
-            placeholder = "12.345.678-9"
+            valor = form.rut,
+            alCambiar = viewModel::onRutChange,
+            placeholder = "12.345.678-9",
+            error = errors.rut
         )
 
         CampoRegistro(
             etiqueta = "Nro Documento",
-            valor = nro_documento,
-            alCambiar = { nro_documento = it },
-            placeholder = "000.000.000"
+            valor = form.nro_documento,
+            alCambiar = viewModel::onNroDocumentoChange,
+            placeholder = "000.000.000",
+            error = errors.nro_documento
         )
 
         Spacer(modifier = Modifier.height(40.dp))
 
         Button(
-            onClick = { modal = true },
+            onClick = { viewModel.registrar() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = GrisBoton)
-
-        ){
+        ) {
             Text(text = "Registrarme", fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(32.dp))
     }
-    if (modal) {
+
+    // El modal aparece solo cuando el ViewModel tiene un mensaje para mostrar
+    mensajeModal?.let { mensaje ->
         AlertDialog(
-            onDismissRequest = { modal = false },
-            title = { Text("Registro exitoso") },
-            text = { Text("Tu cuenta fue creada correctamente") },
+            onDismissRequest = { /* obliga a presionar OK */ },
+            title = { Text("Registro") },
+            text = { Text(mensaje) },
             confirmButton = {
                 Button(onClick = {
-                    modal = false
-                    navController.navigate("login")
+                    val fueExitoso = registroExitoso
+                    viewModel.cerrarModal()
+                    if (fueExitoso) {
+                        navController.navigate("login")
+                    }
                 }) {
                     Text("OK")
                 }
             }
         )
     }
-
 }
