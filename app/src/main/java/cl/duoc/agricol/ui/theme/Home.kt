@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import cl.duoc.agricol.ui.PantallaBuscar
+import cl.duoc.agricol.ui.PantallaInicio
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,8 +92,8 @@ fun Home(
         ) {
 
             when (itemSeleccionado) {
-                0 -> PestanaInicio()
-                1 -> PestanaBuscar()
+                0 -> PantallaInicio()
+                1 -> PantallaBuscar()
                 2 -> PestanaMensajes()
 
             }
@@ -100,13 +102,13 @@ fun Home(
 }
 
 @Composable
-private fun PestanaInicio() {
+private fun PantallaInicio() {
 
     Text("Publicaciones")
 }
 
 @Composable
-private fun PestanaBuscar() {
+private fun PantallaBuscar() {
 
     Text("Buscar")
 }
