@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import cl.duoc.agricol.ui.PantallaBuscar
 import cl.duoc.agricol.ui.PantallaInicio
+import cl.duoc.agricol.ui.PantallaMensajes
+import cl.duoc.agricol.ui.PantallaPerfil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,7 +96,8 @@ fun Home(
             when (itemSeleccionado) {
                 0 -> PantallaInicio()
                 1 -> PantallaBuscar()
-                2 -> PestanaMensajes()
+                2 -> PantallaMensajes()
+                3 -> PantallaPerfil()
 
             }
         }
