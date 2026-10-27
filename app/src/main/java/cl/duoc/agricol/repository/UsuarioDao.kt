@@ -3,7 +3,7 @@ package cl.duoc.agricol.repository
 import cl.duoc.agricol.model.Usuario
 import androidx.room.*
 @Dao
-interface UsuariosDao {
+interface UsuarioDao {
     @Query("SELECT * FROM usuarios")
     suspend fun getAll(): List<Usuario>
 

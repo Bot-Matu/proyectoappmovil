@@ -14,6 +14,6 @@ import cl.duoc.agricol.model.Usuario
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun usuariosDao(): UsuariosDao
+    abstract fun usuariosDao(): UsuarioDao
     abstract fun publicacionesDao(): PublicacionesDao
 }
