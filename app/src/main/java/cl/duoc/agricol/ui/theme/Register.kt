@@ -34,19 +34,17 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.runtime.collectAsState
+import cl.duoc.agricol.viewmodel.UsuarioViewModel
 
 val AzulEtiqueta = Color(0xFF4A5BD0)
 val GrisBoton = Color(0xFF50525F)
 
 @Composable
-fun Register(navController: NavController) {
+fun Register(navController: NavController, viewModel: UsuarioViewModel) {
 
-    var correo by remember { mutableStateOf("") }
-    var nombre by remember { mutableStateOf("") }
-    var telefono by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var rep_password by remember { mutableStateOf("") }
-    var terminos by remember { mutableStateOf(false) }
+    val form by viewModel.form.collectAsState()
+    val errors by viewModel.errors.collectAsState()
 
     Column(
         modifier = Modifier
@@ -68,58 +66,70 @@ fun Register(navController: NavController) {
 
         CampoRegistro(
             etiqueta = "Email",
-            valor = correo,
-            alCambiar = { correo = it },
+            valor = form.correo,
+            alCambiar = viewModel::onCorreoChange,
             placeholder = "Agricultor@Gmail.com",
-            teclado = KeyboardType.Email
+            teclado = KeyboardType.Email,
+            error = errors.correo
         )
 
         CampoRegistro(
             etiqueta = "Nombre Completo",
-            valor = nombre,
-            alCambiar = { nombre = it },
-            placeholder = "Nombre"
+            valor = form.nombre,
+            alCambiar = viewModel::onNombreChange,
+            placeholder = "Nombre",
+            error = errors.nombre
         )
 
         CampoRegistro(
             etiqueta = "Celular",
-            valor = telefono,
-            alCambiar = { if (it.all { letra -> letra.isDigit() }) telefono = it },
+            valor = form.celular,
+            alCambiar = viewModel::onCelularChange,
             placeholder = "12345678",
             teclado = KeyboardType.Phone,
-            prefijo = "+56 9 "
+            prefijo = "+56 9 ",
+            error = errors.celular
         )
 
         CampoRegistro(
             etiqueta = "Contraseña",
-            valor = password,
-            alCambiar = { password = it },
+            valor = form.contrasena,
+            alCambiar = viewModel::onContrasenaChange,
             placeholder = "xxxxxxxxxxxxx",
             teclado = KeyboardType.Password,
-            esPassword = true
+            esPassword = true,
+            error = errors.contrasena
         )
 
         CampoRegistro(
             etiqueta = "Repetir Contraseña",
-            valor = rep_password,
-            alCambiar = { rep_password = it },
+            valor = form.rep_contrasena,
+            alCambiar = viewModel::onRepContrasenaChange,
             placeholder = "xxxxxxxxxxxxx",
             teclado = KeyboardType.Password,
-            esPassword = true
+            esPassword = true,
+            error = errors.rep_contrasena
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
-                checked = terminos,
-                onCheckedChange = { terminos = it }
+                checked = form.terminos,
+                onCheckedChange = viewModel::onTerminosChange
             )
             Text(text = "Aceptar Terminos y Condiciones", fontSize = 13.sp)
+        }
+        errors.terminos?.let {
+            Text(text = it, color = Color.Red, fontSize = 12.sp)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { navController.navigate("register2") },
+            onClick = {
+                if (viewModel.validarRegistro()) {
+                    navController.navigate("register2")
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -144,10 +154,12 @@ fun Register(navController: NavController) {
             )
         }
 
-    }
         Spacer(modifier = Modifier.height(32.dp))
+    }
 }
 
+// Esta función dibuja UN campo: etiqueta azul + caja de texto con línea abajo.
+// Los parámetros son lo único que cambia entre un campo y otro.
 // Esta función dibuja UN campo: etiqueta azul + caja de texto con línea abajo.
 // Los parámetros son lo único que cambia entre un campo y otro.
 @Composable
@@ -158,7 +170,8 @@ fun CampoRegistro(
     placeholder: String,
     teclado: KeyboardType = KeyboardType.Text,  // valor por defecto: teclado normal
     esPassword: Boolean = false,                // por defecto NO es contraseña
-    prefijo: String? = null                     // por defecto NO tiene prefijo
+    prefijo: String? = null,                    // por defecto NO tiene prefijo
+    error: String? = null                       // por defecto NO tiene error
 ) {
     Text(
         text = etiqueta,
@@ -167,21 +180,18 @@ fun CampoRegistro(
         fontWeight = FontWeight.Medium
     )
 
-    // TextField en vez de OutlinedTextField.
-    // OutlinedTextField dibuja una caja con borde completo.
-    // TextField dibuja solo la línea de abajo (mockup).
     TextField(
         value = valor,
         onValueChange = alCambiar,
-        // placeholder = texto gris de ejemplo que desaparece al escribir
         placeholder = { Text(text = placeholder, color = Color.LightGray) },
         prefix = if (prefijo != null) ({ Text(text = prefijo) }) else null,
         singleLine = true,
-        // Si es contraseña, muestra puntitos; si no, muestra el texto normal.
+        // Si hay error, el campo se pinta en rojo y se muestra el mensaje debajo
+        isError = error != null,
+        supportingText = { error?.let { Text(it) } },
         visualTransformation = if (esPassword) PasswordVisualTransformation()
         else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(keyboardType = teclado),
-        // Fondo transparente: por defecto TextField trae un fondo gris/morado.
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent

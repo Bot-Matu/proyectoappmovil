@@ -42,15 +42,20 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.runtime.collectAsState
+import cl.duoc.agricol.viewmodel.UsuarioViewModel
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 
 @Composable
-fun Login(navController: NavController){
+fun Login(navController: NavController, viewModel: UsuarioViewModel){
+
 
     var rut by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var verPassword by remember {mutableStateOf(false)}
     var modal by remember { mutableStateOf(false) }
+    val errorLogin by viewModel.errorLogin.collectAsState()
 
     Column(
         modifier = Modifier
@@ -112,6 +117,7 @@ fun Login(navController: NavController){
             onValueChange = {password = it},
             placeholder = { Text(text = "xxxxxxxxxx", color = Color.LightGray) },
             singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent
@@ -122,7 +128,11 @@ fun Login(navController: NavController){
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = {navController.navigate("home")},
+            onClick = {
+                viewModel.iniciarSesion(rut, password) {
+                    navController.navigate("home")
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -184,6 +194,18 @@ fun Login(navController: NavController){
                 text = { Text("Te enviaremos un correo con las instrucciones.") },
                 confirmButton = {
                     Button(onClick = { modal = false }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+        errorLogin?.let { mensaje ->
+            AlertDialog(
+                onDismissRequest = { viewModel.cerrarErrorLogin() },
+                title = { Text("No se pudo iniciar sesión") },
+                text = { Text(mensaje) },
+                confirmButton = {
+                    Button(onClick = { viewModel.cerrarErrorLogin() }) {
                         Text("OK")
                     }
                 }
