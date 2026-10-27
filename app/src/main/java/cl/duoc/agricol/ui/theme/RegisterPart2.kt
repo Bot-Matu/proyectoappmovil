@@ -101,6 +101,8 @@ fun RegisterPart2(navController: NavController, viewModel: UsuarioViewModel) {
             error = errors.nro_documento
         )
 
+        CamaraDocumento()
+
         Spacer(modifier = Modifier.height(40.dp))
 
         Button(
