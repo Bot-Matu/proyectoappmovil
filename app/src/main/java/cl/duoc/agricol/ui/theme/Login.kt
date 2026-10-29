@@ -22,7 +22,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -35,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -45,6 +43,8 @@ import androidx.navigation.NavController
 import androidx.compose.runtime.collectAsState
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.size
 
 
 @Composable
@@ -56,6 +56,7 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel){
     var verPassword by remember {mutableStateOf(false)}
     var modal by remember { mutableStateOf(false) }
     val errorLogin by viewModel.errorLogin.collectAsState()
+    val cargando by viewModel.cargando.collectAsState()
 
     Column(
         modifier = Modifier
@@ -133,13 +134,25 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel){
                     navController.navigate("home")
                 }
             },
+            enabled = !cargando,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
             shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = GrisBoton)
-        ){
-            Text(text = "Iniciar Sesion", fontWeight = FontWeight.Bold)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = GrisBoton,
+                disabledContainerColor = Color.LightGray
+            )
+        ) {
+            if (cargando) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(30.dp),
+                    strokeWidth = 2.dp,
+                    color = AzulEtiqueta
+                )
+            } else {
+                Text(text = "Iniciar Sesion", fontWeight = FontWeight.Bold)
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
