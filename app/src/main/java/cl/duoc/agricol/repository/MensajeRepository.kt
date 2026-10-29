@@ -1,14 +1,11 @@
 package cl.duoc.agricol.repository
 
 import cl.duoc.agricol.model.Mensaje
+import kotlinx.coroutines.flow.Flow
 
-class MensajeRepository {
-
-    fun obtenerMensajes(): List<Mensaje> {
-        return listOf(
-            Mensaje(id = 1, nombre = "Mario Soto", texto = "Hola, ¿sigue disponible el trabajo de poda?"),
-            Mensaje(id = 2, nombre = "María Pérez", texto = "Gracias por aplicar, te escribo mañana."),
-            Mensaje(id = 3, nombre = "Diego Raúl", texto = "Perfecto, nos vemos el 15 de noviembre.")
-        )
-    }
+interface MensajeRepository {
+    fun obtenerMensajesPorConversacion(conversacionId: Int): Flow<List<Mensaje>>
+    suspend fun enviarMensaje(mensaje: Mensaje)
+    suspend fun actualizarEstadoMensaje(mensajeId: Int, nuevoEstado: String)
+    suspend fun eliminarMensaje(mensaje: Mensaje)
 }
