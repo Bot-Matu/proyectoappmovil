@@ -11,4 +11,8 @@ class UsuarioRepository(private val usuarioDao: UsuarioDao) {
 
     suspend fun existeRut(rut: String): Boolean =
         usuarioDao.buscarPorRut(rut) != null
+
+
+
+
 }
