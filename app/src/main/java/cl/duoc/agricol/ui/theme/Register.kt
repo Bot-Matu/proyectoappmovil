@@ -37,8 +37,7 @@ import androidx.navigation.NavController
 import androidx.compose.runtime.collectAsState
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
 
-val AzulEtiqueta = Color(0xFF4A5BD0)
-val GrisBoton = Color(0xFF50525F)
+
 
 @Composable
 fun Register(navController: NavController, viewModel: UsuarioViewModel) {
