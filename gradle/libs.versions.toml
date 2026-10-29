@@ -9,8 +9,10 @@ activityCompose = "1.13.0"
 kotlin = "2.2.10"
 composeBom = "2026.02.01"
 ksp = "2.3.11"
+material-icons-extended = "1.7.8"
 
 [libraries]
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

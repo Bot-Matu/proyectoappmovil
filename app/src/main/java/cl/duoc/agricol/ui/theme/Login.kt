@@ -1,59 +1,36 @@
 package cl.duoc.agricol.ui.theme
 
-
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.compose.runtime.collectAsState
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.foundation.layout.size
-
 
 @Composable
-fun Login(navController: NavController, viewModel: UsuarioViewModel){
-
-
+fun Login(navController: NavController, viewModel: UsuarioViewModel) {
     var rut by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var verPassword by remember {mutableStateOf(false)}
+    var verPassword by remember { mutableStateOf(false) }
     var modal by remember { mutableStateOf(false) }
     val errorLogin by viewModel.errorLogin.collectAsState()
     val cargando by viewModel.cargando.collectAsState()
@@ -61,24 +38,23 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel){
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.Start
+    ) {
+        Spacer(modifier = Modifier.height(56.dp))
 
-    ){
-
-        Spacer(modifier = Modifier.height(48.dp))
-
+        // Logo circular azul con letra A
         Box(
             modifier = Modifier
-                .size(100.dp)
+                .size(90.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF2F6BFF))
+                .background(AzulPrimario)
                 .align(Alignment.CenterHorizontally),
             contentAlignment = Alignment.Center
-
-        ){
-            Text(text = "A", color = Color.White, fontSize = 48.sp, fontWeight = FontWeight.Bold)
+        ) {
+            Text("A", color = Color.White, fontSize = 44.sp, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -87,47 +63,61 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel){
             text = "Agricolab",
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            fontSize = 20.sp
+            fontSize = 18.sp,
+            color = Color(0xFF111827)
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(36.dp))
 
-        Text(text = "Iniciar Sesion", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        Text("Inicia Sesion", fontSize = 26.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(text = "Rut", color = AzulEtiqueta, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        // Campo Rut
+        Text("Rut", color = AzulEtiqueta, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         TextField(
             value = rut,
-            onValueChange = {rut = it},
-            placeholder = { Text(text = "xx.xxx.xxx-k", color = Color.LightGray) },
+            onValueChange = { rut = it },
+            placeholder = { Text("xx.xxx.xxx-k", color = Color.LightGray) },
             singleLine = true,
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
+                focusedContainerColor   = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor   = AzulPrimario
             ),
             modifier = Modifier.fillMaxWidth()
-
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text(text = "Contraseña", color = AzulEtiqueta, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        // Campo Contraseña con ojo
+        Text("Contraseña", color = AzulEtiqueta, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         TextField(
             value = password,
-            onValueChange = {password = it},
-            placeholder = { Text(text = "xxxxxxxxxx", color = Color.LightGray) },
+            onValueChange = { password = it },
+            placeholder = { Text("xxxxxxxxxx", color = Color.LightGray) },
             singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (verPassword) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { verPassword = !verPassword }) {
+                    Icon(
+                        imageVector = if (verPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        contentDescription = null,
+                        tint = Color.Gray
+                    )
+                }
+            },
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
+                focusedContainerColor   = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor   = AzulPrimario
             ),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Botón principal
         Button(
             onClick = {
                 viewModel.iniciarSesion(rut, password) {
@@ -135,35 +125,30 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel){
                 }
             },
             enabled = !cargando,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
+            modifier = Modifier.fillMaxWidth().height(50.dp),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = GrisBoton,
+                containerColor         = GrisBoton,
                 disabledContainerColor = Color.LightGray
             )
         ) {
             if (cargando) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(30.dp),
-                    strokeWidth = 2.dp,
-                    color = AzulEtiqueta
-                )
+                CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp, color = Color.White)
             } else {
-                Text(text = "Iniciar Sesion", fontWeight = FontWeight.Bold)
+                Text("Inicia sesion", fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
+        // Link registro
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            Text(text = "No tienes Cuenta? Registrate ", fontSize = 12.sp)
+            Text("No tienes Cuenta? Registrate ", fontSize = 12.sp, color = TextoSecundario)
             Text(
-                text = "aquí",
+                "aquí",
                 fontSize = 12.sp,
                 color = AzulEtiqueta,
                 textDecoration = TextDecoration.Underline,
@@ -171,62 +156,54 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel){
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
+        // Botón Google (outlined)
         OutlinedButton(
-            onClick = { /* pendiente: login con Google */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
+            onClick = { /* Google login pendiente */ },
+            modifier = Modifier.fillMaxWidth().height(50.dp),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
         ) {
-            Text(text = "Continuar con Google", fontWeight = FontWeight.Bold)
+            Text("G  ", fontWeight = FontWeight.Bold, color = AzulPrimario, fontSize = 16.sp)
+            Text("Continuar con Google", fontWeight = FontWeight.Medium)
         }
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
+        // Link recuperar
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            Text(text = "Olvidaste tu contraseña? ", fontSize = 12.sp, color = Color.Gray)
+            Text("Olvidaste tu contraseña? ", fontSize = 12.sp, color = TextoSecundario)
             Text(
-                text = "Recuperar",
+                "Recuperar",
                 fontSize = 12.sp,
                 color = AzulEtiqueta,
                 textDecoration = TextDecoration.Underline,
-                modifier = Modifier.clickable { modal = true  }
+                modifier = Modifier.clickable { modal = true }
             )
         }
 
+        // Modales de error / recuperar
         if (modal) {
             AlertDialog(
                 onDismissRequest = { modal = false },
                 title = { Text("Recuperar contraseña") },
-                text = { Text("Te enviaremos un correo con las instrucciones.") },
-                confirmButton = {
-                    Button(onClick = { modal = false }) {
-                        Text("OK")
-                    }
-                }
+                text  = { Text("Te enviaremos un correo con las instrucciones.") },
+                confirmButton = { Button(onClick = { modal = false }) { Text("OK") } }
             )
         }
-        errorLogin?.let { mensaje ->
+        errorLogin?.let { msg ->
             AlertDialog(
                 onDismissRequest = { viewModel.cerrarErrorLogin() },
                 title = { Text("No se pudo iniciar sesión") },
-                text = { Text(mensaje) },
-                confirmButton = {
-                    Button(onClick = { viewModel.cerrarErrorLogin() }) {
-                        Text("OK")
-                    }
-                }
+                text  = { Text(msg) },
+                confirmButton = { Button(onClick = { viewModel.cerrarErrorLogin() }) { Text("OK") } }
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-
+        Spacer(modifier = Modifier.height(40.dp))
     }
 }
