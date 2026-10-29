@@ -16,4 +16,18 @@ interface UsuarioDao {
     // Devuelve el usuario solo si el RUT y la contraseña coinciden
     @Query("SELECT * FROM usuarios WHERE rut = :rut AND contrasena = :contrasena LIMIT 1")
     suspend fun iniciarSesion(rut: String, contrasena: String): Usuario?
+
+    // Marcar una sesión como activa
+    @Query("UPDATE usuarios SET sesionActiva = 1 WHERE id = :id")
+    suspend fun activarSesion(id: Int)
+
+    // Cerrar todas las sesiones
+    @Query("UPDATE usuarios SET sesionActiva = 0")
+    suspend fun cerrarSesiones()
+
+    // Obtener la sesión activa
+    @Query("SELECT * FROM usuarios WHERE sesionActiva = 1 LIMIT 1")
+    suspend fun buscarSesionActiva(): Usuario?
+
+
 }

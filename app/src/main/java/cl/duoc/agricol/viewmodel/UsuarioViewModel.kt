@@ -150,6 +150,18 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
     private val _usuarioActual = MutableStateFlow<Usuario?>(null)
     val usuarioActual: StateFlow<Usuario?> = _usuarioActual
 
+    // Es true cuando ya se revisó si había una sesión guardada
+    private val _sesionCargada = MutableStateFlow(false)
+    val sesionCargada: StateFlow<Boolean> = _sesionCargada
+
+    // busca si quedó una sesión abierta
+    init {
+        viewModelScope.launch {
+            _usuarioActual.value = repository.obtenerSesionActiva()
+            _sesionCargada.value = true
+        }
+    }
+
     // Mensaje de error del login; si es null, no se muestra el modal
     private val _errorLogin = MutableStateFlow<String?>(null)
     // Es true mientras se verifica el login; la pantalla lo usa para mostrar la animación
@@ -172,7 +184,8 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
             _cargando.value = false
 
             if (usuario != null) {
-                _usuarioActual.value = usuario   // guarda quién entró
+                repository.guardarSesion(usuario)   // deja la sesión guardada en Room
+                _usuarioActual.value = usuario
                 onExito()
             } else {
                 _errorLogin.value = "RUT o contraseña incorrectos"
@@ -186,6 +199,9 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
 
     fun cerrarSesion() {
         _usuarioActual.value = null
+        viewModelScope.launch {
+            repository.cerrarSesion()   // quita la marca de sesión abierta en Room
+        }
     }
 
     // Quita puntos y espacios para que "12.345.678-9" y "12345678-9" sean el mismo RUT
