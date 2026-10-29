@@ -34,12 +34,13 @@ import cl.duoc.agricol.ui.PantallaBuscar
 import cl.duoc.agricol.ui.PantallaInicio
 import cl.duoc.agricol.ui.PantallaMensajes
 import cl.duoc.agricol.ui.PantallaPerfil
+import cl.duoc.agricol.viewmodel.UsuarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
-
-            navController: NavController
+    navController: NavController,
+    usuarioViewModel: UsuarioViewModel
 ) {
     var itemSeleccionado by remember { mutableIntStateOf(0) }
     val titulos = listOf("Inicio", "Buscar", "Mensajes", "Perfil")
@@ -97,7 +98,13 @@ fun Home(
                 0 -> PantallaInicio()
                 1 -> PantallaBuscar()
                 2 -> PantallaMensajes()
-                3 -> PantallaPerfil(onCerrarSesion = { navController.navigate("login") })
+                3 -> PantallaPerfil(
+                    viewModel = usuarioViewModel,
+                    onCerrarSesion = {
+                        usuarioViewModel.cerrarSesion()
+                        navController.navigate("login")
+                    }
+                )
 
             }
         }

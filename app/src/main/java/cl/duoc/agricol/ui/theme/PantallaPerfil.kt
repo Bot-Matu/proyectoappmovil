@@ -4,19 +4,22 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.duoc.agricol.R
-import cl.duoc.agricol.viewmodel.PerfilViewModel
+import cl.duoc.agricol.viewmodel.UsuarioViewModel
 
 @Composable
 fun PantallaPerfil(
-    onCerrarSesion: () -> Unit = {},
-    viewModel: PerfilViewModel = viewModel()
+    viewModel: UsuarioViewModel,
+    onCerrarSesion: () -> Unit = {}
 ) {
+    val usuario by viewModel.usuarioActual.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -31,10 +34,10 @@ fun PantallaPerfil(
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(
-                    text = viewModel.nombre,
+                    text = usuario?.nombre ?: "",
                     style = MaterialTheme.typography.headlineSmall
                 )
-                Text("Trabajos Finalizados: ${viewModel.trabajosFinalizados}")
+                Text(usuario?.correo ?: "")
                 Text("Conectado/a")
             }
         }

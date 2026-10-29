@@ -9,6 +9,7 @@ import cl.duoc.agricol.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() {
 
@@ -140,11 +141,19 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
 
     // ---------- Login ----------
 
+    // El usuario que inició sesión; null significa que no hay sesión abierta
+    private val _usuarioActual = MutableStateFlow<Usuario?>(null)
+    val usuarioActual: StateFlow<Usuario?> = _usuarioActual
+
     // Mensaje de error del login; si es null, no se muestra el modal
     private val _errorLogin = MutableStateFlow<String?>(null)
-    val errorLogin: StateFlow<String?> = _errorLogin
+    // Es true mientras se verifica el login; la pantalla lo usa para mostrar la animación
+    private val _cargando = MutableStateFlow(false)
 
-    // Busca al usuario en Room; si existe, ejecuta onExito (que navega a Home)
+    val errorLogin: StateFlow<String?> = _errorLogin
+    val cargando: StateFlow<Boolean> = _cargando
+
+    // Busca al usuario en Room; si existe, ejecuta onExito (navega a Home)
     fun iniciarSesion(rut: String, contrasena: String, onExito: () -> Unit) {
         if (rut.isBlank() || contrasena.isBlank()) {
             _errorLogin.value = "Ingresa tu RUT y tu contraseña"
@@ -152,8 +161,13 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
         }
 
         viewModelScope.launch {
+            _cargando.value = true
+            delay(1000) // simula el tiempo de verificación, como en el ejemplo del profe
             val usuario = repository.iniciarSesion(limpiarRut(rut), contrasena)
+            _cargando.value = false
+
             if (usuario != null) {
+                _usuarioActual.value = usuario   // guarda quién entró
                 onExito()
             } else {
                 _errorLogin.value = "RUT o contraseña incorrectos"
@@ -163,6 +177,10 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
 
     fun cerrarErrorLogin() {
         _errorLogin.value = null
+    }
+
+    fun cerrarSesion() {
+        _usuarioActual.value = null
     }
 
     // Quita puntos y espacios para que "12.345.678-9" y "12345678-9" sean el mismo RUT

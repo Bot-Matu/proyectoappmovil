@@ -12,7 +12,7 @@ fun Navegacion(usuarioViewModel: UsuarioViewModel) {
     NavHost(navController, startDestination = "login") {
         composable("register") { Register(navController, usuarioViewModel) }
         composable("login") { Login(navController, usuarioViewModel) }
-        composable("home") { Home(navController) }
+        composable("home") { Home(navController, usuarioViewModel) }
         composable("register2") { RegisterPart2(navController, usuarioViewModel) }
     }
 }
