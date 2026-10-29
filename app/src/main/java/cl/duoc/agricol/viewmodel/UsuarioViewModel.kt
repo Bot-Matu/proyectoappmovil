@@ -44,7 +44,7 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
 
     fun onCelularChange(valor: String) {
         // Solo se aceptan números
-        if (valor.all { it.isDigit() }) {
+        if (valor.all { it.isDigit() } && valor.length <= 8) {
             _form.value = _form.value.copy(celular = valor)
             _errors.value = _errors.value.copy(celular = null)
         }
@@ -66,8 +66,13 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
     }
 
     fun onRutChange(valor: String) {
-        _form.value = _form.value.copy(rut = valor)
-        _errors.value = _errors.value.copy(rut = null)
+        val caracteresValidos = valor.all {
+            it.isDigit() || it == '.' || it == '-' || it == 'k' || it == 'K'
+        }
+        if (caracteresValidos && valor.length <= 12) {
+            _form.value = _form.value.copy(rut = valor)
+            _errors.value = _errors.value.copy(rut = null)
+        }
     }
 
     fun onNroDocumentoChange(valor: String) {
@@ -101,7 +106,7 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
         val f = _form.value
         val rutLimpio = limpiarRut(f.rut)
         val errores = _errors.value.copy(
-            rut = if (!rutLimpio.contains("-")) "Ingresa el RUT con guion, ej: 12345678-9" else null,
+            rut = if (!rutLimpio.matches(Regex("^\\d{7,8}-[0-9K]$"))) "RUT inválido. Ejemplo: 12345678-9" else null,
             nro_documento = if (f.nro_documento.isBlank()) "El número de documento es obligatorio" else null
         )
         _errors.value = errores
