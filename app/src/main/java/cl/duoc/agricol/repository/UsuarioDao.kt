@@ -2,6 +2,7 @@ package cl.duoc.agricol.repository
 
 import androidx.room.*
 import cl.duoc.agricol.model.Usuario
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UsuarioDao {
@@ -28,6 +29,13 @@ interface UsuarioDao {
     // Obtener la sesión activa
     @Query("SELECT * FROM usuarios WHERE sesionActiva = 1 LIMIT 1")
     suspend fun buscarSesionActiva(): Usuario?
+
+    // Todos los usuarios menos el que tiene la sesión abierta (para elegir con quién chatear)
+    @Query("SELECT * FROM usuarios WHERE id != :yoId ORDER BY nombre")
+    fun observarOtros(yoId: Int): Flow<List<Usuario>>
+
+    @Query("SELECT nombre FROM usuarios WHERE id = :id LIMIT 1")
+    suspend fun nombrePorId(id: Int): String?
 
 
 }

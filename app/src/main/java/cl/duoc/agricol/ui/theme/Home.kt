@@ -17,10 +17,15 @@ import cl.duoc.agricol.ui.PantallaPerfil
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import cl.duoc.agricol.viewmodel.ConversacionesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Home(navController: NavController, usuarioViewModel: UsuarioViewModel) {
+fun Home(
+    navController: NavController,
+    usuarioViewModel: UsuarioViewModel,
+    conversacionesViewModel: ConversacionesViewModel
+) {
     var itemSeleccionado by remember { mutableIntStateOf(0) }
 
     val titulos = listOf("Inicio", "Buscar", "Mensajes", "Perfil")
@@ -28,7 +33,9 @@ fun Home(navController: NavController, usuarioViewModel: UsuarioViewModel) {
         Icons.Default.Home,
         Icons.Default.Search,
         Icons.AutoMirrored.Filled.Message,
-        Icons.Default.Person
+        Icons.Default.Person,
+        Icons.Default.Notifications
+
     )
 
     Scaffold(
@@ -44,8 +51,8 @@ fun Home(navController: NavController, usuarioViewModel: UsuarioViewModel) {
                     IconButton(onClick = { /* nueva publicación */ }) {
                         Icon(Icons.Default.Add, contentDescription = "Nuevo")
                     }
-                    IconButton(onClick = { itemSeleccionado = 3 }) {
-                        Icon(Icons.Default.Person, contentDescription = "Perfil")
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -75,7 +82,7 @@ fun Home(navController: NavController, usuarioViewModel: UsuarioViewModel) {
             when (itemSeleccionado) {
                 0 -> PantallaInicio()
                 1 -> PantallaBuscar()
-                2 -> PantallaMensajes()
+                2 -> PantallaMensajes(navController, conversacionesViewModel)
                 3 -> PantallaPerfil(
                     viewModel      = usuarioViewModel,
                     onCerrarSesion = {
