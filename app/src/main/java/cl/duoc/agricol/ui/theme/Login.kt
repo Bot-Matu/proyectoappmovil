@@ -1,5 +1,7 @@
 package cl.duoc.agricol.ui.theme
 
+import android.R.color.white
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -25,6 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
+
+// IMPORTACIÓN CRÍTICA: Esto le dice al código dónde encontrar tus recursos como drawables
+import cl.duoc.agricol.R
 
 @Composable
 fun Login(navController: NavController, viewModel: UsuarioViewModel) {
@@ -45,16 +52,21 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel) {
     ) {
         Spacer(modifier = Modifier.height(56.dp))
 
-        // Logo circular azul con letra A
+        // Logo circular azul con tu imagen adentro
         Box(
             modifier = Modifier
                 .size(90.dp)
                 .clip(CircleShape)
-                .background(AzulPrimario)
                 .align(Alignment.CenterHorizontally),
             contentAlignment = Alignment.Center
         ) {
-            Text("A", color = Color.White, fontSize = 44.sp, fontWeight = FontWeight.Bold)
+            Image(
+
+                painter = painterResource(id = R.drawable.mi_logo_interno),
+                contentDescription = "Logo de la aplicación",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(80.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -195,6 +207,7 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel) {
                 confirmButton = { Button(onClick = { modal = false }) { Text("OK") } }
             )
         }
+
         errorLogin?.let { msg ->
             AlertDialog(
                 onDismissRequest = { viewModel.cerrarErrorLogin() },
@@ -203,7 +216,5 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel) {
                 confirmButton = { Button(onClick = { viewModel.cerrarErrorLogin() }) { Text("OK") } }
             )
         }
-
-        Spacer(modifier = Modifier.height(40.dp))
     }
 }
