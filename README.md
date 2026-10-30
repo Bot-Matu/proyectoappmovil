@@ -2,7 +2,7 @@ Agricol - Aplicación Móvil Android
 
 Agricol es una plataforma móvil desarrollada de forma nativa para Android. Está orientada al sector agrícola, facilitando la publicación de servicios/productos, la gestión de usuarios, una red de interacción mediante chat en tiempo real/mensajería interna y un sistema de notificaciones integradas.
 
-🚀 Características Principales
+Características Principales
 
 Autenticación y Registro de Usuarios:
 
@@ -46,7 +46,7 @@ Gestión de Estado: Android Architecture Components (ViewModel, Kotlin Coroutine
 
 Gestión de Dependencias: Gradle Version Catalogs (libs.versions.toml).
 
-📂 Estructura del Proyecto
+Estructura del Proyecto
 
 cl.duoc.agricol/
 ├── model/                     # Modelos de datos (Usuario, Publicacion, Mensaje, Estado, etc.)
@@ -57,7 +57,7 @@ cl.duoc.agricol/
 └── viewmodel/                 # Lógica de negocio (UsuarioViewModel, PublicacionViewModel, etc.)
 
 
-📋 Requisitos Previos
+Requisitos Previos
 
 Android Studio: Ladybug / Iguana o superior.
 
@@ -67,7 +67,7 @@ SDK Mínimo: Android 8.0 (API Nivel 26) o superior.
 
 Gradle: Version wrapper configurado en el proyecto.
 
-⚙️ Instalación y Configuración
+Instalación y Configuración
 
 Clonar el repositorio:
 
