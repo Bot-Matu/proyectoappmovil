@@ -124,7 +124,7 @@ fun Home(
             } else {
                 when (itemSeleccionado) {
                     0 -> PantallaInicio(onVerDetalle = { publicacionSeleccionada = it })
-                    1 -> PantallaBuscar()
+                    1 -> PantallaBuscar(onVerDetalle = { publicacionSeleccionada = it })
                     2 -> PantallaMensajes(navController, conversacionesViewModel)
                     3 -> PantallaPerfil(
                         viewModel = usuarioViewModel,
