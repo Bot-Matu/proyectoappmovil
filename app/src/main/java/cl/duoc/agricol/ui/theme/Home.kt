@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.duoc.agricol.ui.PanelNotificaciones
 import cl.duoc.agricol.viewmodel.NotificacionViewModel
+import androidx.compose.runtime.saveable.rememberSaveable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
@@ -35,10 +36,12 @@ fun Home(
     conversacionesViewModel: ConversacionesViewModel,
     notificacionViewModel: NotificacionViewModel = viewModel()
 ) {
-    var itemSeleccionado by remember { mutableIntStateOf(0) }
+    var itemSeleccionado by rememberSaveable { mutableIntStateOf(0) }
     var publicacionSeleccionada by remember { mutableStateOf<Publicacion?>(null) }
     var mostrarNotificaciones by remember { mutableStateOf(false) }
+    var avisoChat by remember { mutableStateOf<String?>(null) }
     val hayNoLeidas by notificacionViewModel.hayNoLeidas.collectAsState()
+
 
     val titulos = listOf("Inicio", "Buscar", "Mensajes", "Perfil")
     val iconos  = listOf(
@@ -117,8 +120,14 @@ fun Home(
                     publicacion = publicacion,
                     onVolver = { publicacionSeleccionada = null },
                     onChat = {
-                        publicacionSeleccionada = null
-                        itemSeleccionado = 2   // abre la pestaña Mensajes
+                        val miId = usuarioViewModel.usuarioActual.value?.id
+                        if (miId == publicacion.creadorId) {
+                            avisoChat = "Esta publicación es tuya, no puedes chatear contigo mismo."
+                        } else {
+                            conversacionesViewModel.abrirChat(publicacion.creadorId) { conversacionId ->
+                                navController.navigate("chat/$conversacionId/${publicacion.creadorId}")
+                            }
+                        }
                     }
                 )
             } else {
@@ -136,6 +145,16 @@ fun Home(
                 }
             }
         }
+    }
+    avisoChat?.let { mensaje ->
+        AlertDialog(
+            onDismissRequest = { avisoChat = null },
+            title = { Text("Chat") },
+            text = { Text(mensaje) },
+            confirmButton = {
+                TextButton(onClick = { avisoChat = null }) { Text("OK") }
+            }
+        )
     }
 }
 
