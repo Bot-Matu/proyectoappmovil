@@ -1,6 +1,7 @@
 package cl.duoc.agricol.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import cl.duoc.agricol.ui.theme.AzulPrimario
+import cl.duoc.agricol.ui.theme.AzulSuave
+import cl.duoc.agricol.ui.theme.FondoApp
 import cl.duoc.agricol.ui.theme.TextoSecundario
 import cl.duoc.agricol.viewmodel.ConversacionesViewModel
 
@@ -42,20 +45,40 @@ fun PantallaMensajes(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(FondoApp)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Mensajes y Contactos",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             OutlinedTextField(
                 value = busqueda,
                 onValueChange = { busqueda = it },
                 placeholder = { Text("Buscar mensaje...", fontSize = 13.sp) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = AzulPrimario) },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, contentDescription = null, tint = AzulPrimario)
+                },
                 singleLine = true,
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                shape = RoundedCornerShape(16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedBorderColor = AzulPrimario,
+                    unfocusedBorderColor = AzulSuave
+                ),
+                modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             if (filtradas.isEmpty()) {
                 Text(
@@ -65,63 +88,79 @@ fun PantallaMensajes(
                         "No se encontraron conversaciones.",
                     color = TextoSecundario,
                     fontSize = 13.sp,
-                    modifier = Modifier.padding(24.dp)
+                    modifier = Modifier.padding(top = 12.dp)
                 )
             } else {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(filtradas, key = { it.conversacionId }) { conv ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.White)
+                                .border(1.dp, AzulSuave, RoundedCornerShape(16.dp))
                                 .clickable {
                                     navController.navigate("chat/${conv.conversacionId}/${conv.otroUsuarioId}")
                                 }
-                                .padding(horizontal = 16.dp, vertical = 10.dp),
+                                .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            // Avatar con la inicial del nombre
                             Box(
                                 modifier = Modifier
-                                    .size(44.dp)
+                                    .size(48.dp)
                                     .clip(CircleShape)
                                     .background(AzulPrimario),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    conv.nombre.take(1).uppercase(),
+                                    text = conv.nombre.take(1).uppercase(),
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
 
-                            Spacer(Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(12.dp))
 
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(conv.nombre, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                                Text(
-                                    conv.ultimoMensaje,
-                                    fontSize = 11.sp,
-                                    color = TextoSecundario,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-
-                            Spacer(Modifier.width(8.dp))
-
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(
-                                    formatearHora(conv.ultimoMensajeTiempo),
-                                    fontSize = 11.sp,
-                                    color = TextoSecundario
-                                )
-                                if (conv.noLeidos > 0) {
-                                    Badge(containerColor = AzulPrimario) {
-                                        Text(conv.noLeidos.toString())
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = conv.nombre,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Text(
+                                        text = formatearHora(conv.ultimoMensajeTiempo),
+                                        fontSize = 11.sp,
+                                        color = TextoSecundario
+                                    )
+                                }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = conv.ultimoMensaje,
+                                        fontSize = 13.sp,
+                                        color = TextoSecundario,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    if (conv.noLeidos > 0) {
+                                        Badge(containerColor = AzulPrimario) {
+                                            Text(conv.noLeidos.toString())
+                                        }
                                     }
                                 }
                             }
                         }
-                        HorizontalDivider(color = Color(0xFFE5E7EB))
                     }
                 }
             }

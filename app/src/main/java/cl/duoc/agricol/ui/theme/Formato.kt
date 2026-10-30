@@ -14,3 +14,20 @@ fun formatearDuracion(dias: Int): String {
         else -> "$semanas Semanas"
     }
 }
+
+// Convierte "198765432" en "19.876.543-2"
+fun formatearRut(rut: String): String {
+    if (!rut.contains("-")) {
+        return rut
+    }
+    val cuerpo = rut.substringBefore("-")
+    val digito = rut.substringAfter("-")
+    val conPuntos = cuerpo.reversed().chunked(3).joinToString(".").reversed()
+    return "$conPuntos-$digito"
+}
+
+// Convierte 87654321 en "+56 9 8765 4321"
+fun formatearCelular(celular: Int): String {
+    val texto = celular.toString().padStart(8, '0')
+    return "+56 9 ${texto.take(4)} ${texto.drop(4)}"
+}
