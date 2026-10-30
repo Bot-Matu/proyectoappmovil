@@ -18,15 +18,27 @@ import cl.duoc.agricol.viewmodel.UsuarioViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cl.duoc.agricol.viewmodel.ConversacionesViewModel
-
+import androidx.compose.runtime.mutableStateOf
+import cl.duoc.agricol.model.Publicacion
+import cl.duoc.agricol.ui.PantallaDetalle
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import cl.duoc.agricol.ui.PanelNotificaciones
+import cl.duoc.agricol.viewmodel.NotificacionViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
     navController: NavController,
     usuarioViewModel: UsuarioViewModel,
-    conversacionesViewModel: ConversacionesViewModel
+    conversacionesViewModel: ConversacionesViewModel,
+    notificacionViewModel: NotificacionViewModel = viewModel()
 ) {
     var itemSeleccionado by remember { mutableIntStateOf(0) }
+    var publicacionSeleccionada by remember { mutableStateOf<Publicacion?>(null) }
+    var mostrarNotificaciones by remember { mutableStateOf(false) }
+    val hayNoLeidas by notificacionViewModel.hayNoLeidas.collectAsState()
 
     val titulos = listOf("Inicio", "Buscar", "Mensajes", "Perfil")
     val iconos  = listOf(
@@ -51,8 +63,24 @@ fun Home(
                     IconButton(onClick = { /* nueva publicación */ }) {
                         Icon(Icons.Default.Add, contentDescription = "Nuevo")
                     }
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
+                    // Botón de notificaciones, con el panel pegado debajo
+                    Box {
+                        IconButton(onClick = {
+                            mostrarNotificaciones = true
+                            notificacionViewModel.marcarComoLeidas()
+                        }) {
+                            BadgedBox(badge = { if (hayNoLeidas) { Badge() } }) {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = "Ver notificaciones"
+                                )
+                            }
+                        }
+                        PanelNotificaciones(
+                            expandido = mostrarNotificaciones,
+                            notificaciones = notificacionViewModel.notificaciones,
+                            onCerrar = { mostrarNotificaciones = false }
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -67,7 +95,10 @@ fun Home(
                         icon    = { Icon(iconos[index], contentDescription = titulo) },
                         label   = { Text(titulo) },
                         selected = itemSeleccionado == index,
-                        onClick  = { itemSeleccionado = index },
+                        onClick = {
+                            itemSeleccionado = index
+                            publicacionSeleccionada = null
+                        },
                         colors  = NavigationBarItemDefaults.colors(
                             selectedIconColor       = AzulPrimario,
                             selectedTextColor       = AzulPrimario,
@@ -79,18 +110,32 @@ fun Home(
         }
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
-            when (itemSeleccionado) {
-                0 -> PantallaInicio()
-                1 -> PantallaBuscar()
-                2 -> PantallaMensajes(navController, conversacionesViewModel)
-                3 -> PantallaPerfil(
-                    viewModel      = usuarioViewModel,
-                    onCerrarSesion = {
-                        usuarioViewModel.cerrarSesion()
-                        navController.navigate("login")
+            val publicacion = publicacionSeleccionada
+
+            if (publicacion != null) {
+                PantallaDetalle(
+                    publicacion = publicacion,
+                    onVolver = { publicacionSeleccionada = null },
+                    onChat = {
+                        publicacionSeleccionada = null
+                        itemSeleccionado = 2   // abre la pestaña Mensajes
                     }
                 )
+            } else {
+                when (itemSeleccionado) {
+                    0 -> PantallaInicio(onVerDetalle = { publicacionSeleccionada = it })
+                    1 -> PantallaBuscar()
+                    2 -> PantallaMensajes(navController, conversacionesViewModel)
+                    3 -> PantallaPerfil(
+                        viewModel = usuarioViewModel,
+                        onCerrarSesion = {
+                            usuarioViewModel.cerrarSesion()
+                            navController.navigate("login")
+                        }
+                    )
+                }
             }
         }
     }
 }
+
