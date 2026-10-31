@@ -31,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.duoc.agricol.ui.PanelNotificaciones
 import cl.duoc.agricol.viewmodel.NotificacionViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material.icons.outlined.Info
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
@@ -170,13 +171,12 @@ fun Home(
         }
     }
     avisoChat?.let { mensaje ->
-        AlertDialog(
-            onDismissRequest = { avisoChat = null },
-            title = { Text("Chat") },
-            text = { Text(mensaje) },
-            confirmButton = {
-                TextButton(onClick = { avisoChat = null }) { Text("OK") }
-            }
+        DialogAgricol(
+            titulo = "No se puede abrir el chat",
+            mensaje = mensaje,
+            icono = Icons.Outlined.Info,
+            colorIcono = AzulPrimario,
+            onAceptar = { avisoChat = null }
         )
     }
 }

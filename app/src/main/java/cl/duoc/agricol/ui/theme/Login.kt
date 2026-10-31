@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.ErrorOutline
 
 // IMPORTACIÓN CRÍTICA: Esto le dice al código dónde encontrar tus recursos como drawables
 import cl.duoc.agricol.R
@@ -200,20 +202,22 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel) {
 
         // Modales de error / recuperar
         if (modal) {
-            AlertDialog(
-                onDismissRequest = { modal = false },
-                title = { Text("Recuperar contraseña") },
-                text  = { Text("Te enviaremos un correo con las instrucciones.") },
-                confirmButton = { Button(onClick = { modal = false }) { Text("OK") } }
+            DialogAgricol(
+                titulo = "Recuperar contraseña",
+                mensaje = "Te enviaremos un correo con las instrucciones.",
+                icono = Icons.Outlined.Email,
+                colorIcono = AzulPrimario,
+                onAceptar = { modal = false }
             )
         }
 
         errorLogin?.let { msg ->
-            AlertDialog(
-                onDismissRequest = { viewModel.cerrarErrorLogin() },
-                title = { Text("No se pudo iniciar sesión") },
-                text  = { Text(msg) },
-                confirmButton = { Button(onClick = { viewModel.cerrarErrorLogin() }) { Text("OK") } }
+            DialogAgricol(
+                titulo = "No se pudo iniciar sesión",
+                mensaje = msg,
+                icono = Icons.Outlined.ErrorOutline,
+                colorIcono = RojoAlerta,
+                onAceptar = { viewModel.cerrarErrorLogin() }
             )
         }
     }

@@ -45,6 +45,8 @@ import androidx.navigation.NavController
 import cl.duoc.agricol.ui.theme.Inicio
 import androidx.compose.runtime.collectAsState
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.ErrorOutline
 
 @Composable
 fun RegisterPart2(navController: NavController, viewModel: UsuarioViewModel) {
@@ -151,23 +153,23 @@ fun RegisterPart2(navController: NavController, viewModel: UsuarioViewModel) {
 
     // El modal aparece solo cuando el ViewModel tiene un mensaje para mostrar
     mensajeModal?.let { mensaje ->
-        AlertDialog(
-            onDismissRequest = { /* obliga a presionar OK */ },
-            title = { Text("Registro") },
-            text = { Text(mensaje) },
-            confirmButton = {
-                Button(onClick = {
-                    val fueExitoso = registroExitoso
-                    viewModel.cerrarModal()
-                    if (fueExitoso) {
-                        navController.navigate("login")
-                    }
-                }) {
-                    Text("OK")
+        DialogAgricol(
+            titulo = if (registroExitoso) "¡Registro exitoso!" else "No se pudo registrar",
+            mensaje = mensaje,
+            icono = if (registroExitoso) Icons.Outlined.CheckCircle else Icons.Outlined.ErrorOutline,
+            colorIcono = if (registroExitoso) VerdeEstado else RojoAlerta,
+            textoBoton = if (registroExitoso) "Ir a iniciar sesión" else "Entendido",
+            onAceptar = {
+                val fueExitoso = registroExitoso
+                viewModel.cerrarModal()
+                if (fueExitoso) {
+                    navController.navigate("login")
                 }
-            }
+            },
+            onCerrar = { /* obliga a presionar el botón */ }
         )
     }
+
 }
 
 
