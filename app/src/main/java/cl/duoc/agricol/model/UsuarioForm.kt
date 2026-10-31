@@ -9,6 +9,7 @@ data class UsuarioForm(
     val rep_contrasena: String = "",
     val rut: String = "",
     val nro_documento: String = "",
+    val rol: String = "Trabajador",   // viene preseleccionado, como en la maqueta
     val terminos: Boolean = false
 )
 

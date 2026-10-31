@@ -75,6 +75,10 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
         }
     }
 
+    fun onRolChange(valor: String) {
+        _form.value = _form.value.copy(rol = valor)
+    }
+
     fun onNroDocumentoChange(valor: String) {
         _form.value = _form.value.copy(nro_documento = valor)
         _errors.value = _errors.value.copy(nro_documento = null)
@@ -125,7 +129,8 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
                     correo = f.correo,
                     contrasena = f.contrasena,
                     rut = rutLimpio,
-                    nro_documento = f.nro_documento
+                    nro_documento = f.nro_documento,
+                    rol = f.rol
                 )
                 repository.registrar(usuario)
                 _registroExitoso.value = true

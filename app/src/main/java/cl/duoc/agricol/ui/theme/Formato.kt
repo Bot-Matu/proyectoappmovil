@@ -26,6 +26,11 @@ fun formatearRut(rut: String): String {
     return "$conPuntos-$digito"
 }
 
+// Convierte "Productor" en "Productor / Empleador"
+fun formatearRol(rol: String): String {
+    return if (rol == "Productor") "Productor / Empleador" else "Trabajador Agrícola"
+}
+
 // Convierte 87654321 en "+56 9 8765 4321"
 fun formatearCelular(celular: Int): String {
     val texto = celular.toString().padStart(8, '0')
