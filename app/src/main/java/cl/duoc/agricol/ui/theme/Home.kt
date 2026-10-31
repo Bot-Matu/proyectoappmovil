@@ -62,11 +62,7 @@ fun Home(
     Scaffold(
         topBar = {
             TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { /* abrir drawer */ }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menú")
-                    }
-                },
+
                 title = { Text("Agricolab", style = MaterialTheme.typography.titleMedium) },
                 actions = {
                     IconButton(onClick = {
