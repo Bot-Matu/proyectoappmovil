@@ -17,6 +17,7 @@ import cl.duoc.agricol.viewmodel.BuscarViewModel
 import cl.duoc.agricol.viewmodel.ConversacionesViewModel
 import cl.duoc.agricol.viewmodel.PublicacionViewModel
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
+import cl.duoc.agricol.ui.theme.AgricolTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            AgricolTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

@@ -182,6 +182,8 @@ fun PantallaMensajes(
     if (mostrarContactos) {
         AlertDialog(
             onDismissRequest = { mostrarContactos = false },
+            shape = RoundedCornerShape(24.dp),
+            containerColor = Color.White,
             title = { Text("Nuevo chat") },
             text = {
                 if (contactos.isEmpty()) {
@@ -207,7 +209,10 @@ fun PantallaMensajes(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { mostrarContactos = false }) { Text("Cancelar") }
+                TextButton(
+                    onClick = { mostrarContactos = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = AzulPrimario)
+                ) { Text("Cancelar") }
             }
         )
     }
