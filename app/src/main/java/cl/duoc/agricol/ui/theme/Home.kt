@@ -21,6 +21,9 @@ import cl.duoc.agricol.viewmodel.ConversacionesViewModel
 import androidx.compose.runtime.mutableStateOf
 import cl.duoc.agricol.model.Publicacion
 import cl.duoc.agricol.ui.PantallaDetalle
+import cl.duoc.agricol.ui.PantallaCrearPublicacion
+import cl.duoc.agricol.viewmodel.BuscarViewModel
+import cl.duoc.agricol.viewmodel.PublicacionViewModel
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.runtime.collectAsState
@@ -34,10 +37,13 @@ fun Home(
     navController: NavController,
     usuarioViewModel: UsuarioViewModel,
     conversacionesViewModel: ConversacionesViewModel,
+    publicacionViewModel: PublicacionViewModel,
+    buscarViewModel: BuscarViewModel,
     notificacionViewModel: NotificacionViewModel = viewModel()
 ) {
     var itemSeleccionado by rememberSaveable { mutableIntStateOf(0) }
     var publicacionSeleccionada by remember { mutableStateOf<Publicacion?>(null) }
+    var mostrarCrear by remember { mutableStateOf(false) }
     var mostrarNotificaciones by remember { mutableStateOf(false) }
     var avisoChat by remember { mutableStateOf<String?>(null) }
     val hayNoLeidas by notificacionViewModel.hayNoLeidas.collectAsState()
@@ -63,7 +69,10 @@ fun Home(
                 },
                 title = { Text("Agricolab", style = MaterialTheme.typography.titleMedium) },
                 actions = {
-                    IconButton(onClick = { /* nueva publicación */ }) {
+                    IconButton(onClick = {
+                        mostrarCrear = true
+                        publicacionSeleccionada = null
+                    }) {
                         Icon(Icons.Default.Add, contentDescription = "Nuevo")
                     }
                     // Botón de notificaciones, con el panel pegado debajo
@@ -101,6 +110,7 @@ fun Home(
                         onClick = {
                             itemSeleccionado = index
                             publicacionSeleccionada = null
+                            mostrarCrear = false
                         },
                         colors  = NavigationBarItemDefaults.colors(
                             selectedIconColor       = AzulPrimario,
@@ -115,7 +125,13 @@ fun Home(
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             val publicacion = publicacionSeleccionada
 
-            if (publicacion != null) {
+            if (mostrarCrear) {
+                PantallaCrearPublicacion(
+                    viewModel = publicacionViewModel,
+                    usuario = usuarioViewModel.usuarioActual.value,
+                    onVolver = { mostrarCrear = false }
+                )
+            } else if (publicacion != null) {
                 PantallaDetalle(
                     publicacion = publicacion,
                     onVolver = { publicacionSeleccionada = null },
@@ -132,8 +148,14 @@ fun Home(
                 )
             } else {
                 when (itemSeleccionado) {
-                    0 -> PantallaInicio(onVerDetalle = { publicacionSeleccionada = it })
-                    1 -> PantallaBuscar(onVerDetalle = { publicacionSeleccionada = it })
+                    0 -> PantallaInicio(
+                        onVerDetalle = { publicacionSeleccionada = it },
+                        viewModel = publicacionViewModel
+                    )
+                    1 -> PantallaBuscar(
+                        onVerDetalle = { publicacionSeleccionada = it },
+                        viewModel = buscarViewModel
+                    )
                     2 -> PantallaMensajes(navController, conversacionesViewModel)
                     3 -> PantallaPerfil(
                         viewModel = usuarioViewModel,

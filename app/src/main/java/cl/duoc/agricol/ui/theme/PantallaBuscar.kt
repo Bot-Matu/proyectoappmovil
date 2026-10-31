@@ -35,7 +35,7 @@ import cl.duoc.agricol.viewmodel.BuscarViewModel
 @Composable
 fun PantallaBuscar(
     onVerDetalle: (Publicacion) -> Unit = {},
-    viewModel: BuscarViewModel = viewModel()
+    viewModel: BuscarViewModel
 ) {
     val texto by viewModel.texto.collectAsState()
     val categoriaSeleccionada by viewModel.categoria.collectAsState()

@@ -35,7 +35,7 @@ import cl.duoc.agricol.viewmodel.PublicacionViewModel
 @Composable
 fun PantallaInicio(
     onVerDetalle: (Publicacion) -> Unit = {},
-    viewModel: PublicacionViewModel = viewModel()
+    viewModel: PublicacionViewModel
 ) {
     val publicaciones by viewModel.publicaciones.collectAsState()
     val categoriaSeleccionada by viewModel.categoria.collectAsState()
