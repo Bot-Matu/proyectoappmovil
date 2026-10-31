@@ -1,6 +1,7 @@
 package cl.duoc.agricol.ui.theme
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.BusinessCenter
+import androidx.compose.material.icons.outlined.HowToReg
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -34,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -83,7 +87,33 @@ fun RegisterPart2(navController: NavController, viewModel: UsuarioViewModel) {
             )
         }
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Selector de rol: lo elegido queda guardado en el usuario
+        Text(
+            text = "Selecciona tu Rol",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            TarjetaRol(
+                texto = "Trabajador",
+                icono = Icons.Outlined.HowToReg,
+                seleccionado = form.rol == "Trabajador",
+                onClick = { viewModel.onRolChange("Trabajador") },
+                modifier = Modifier.weight(1f)
+            )
+            TarjetaRol(
+                texto = "Productor",
+                icono = Icons.Outlined.BusinessCenter,
+                seleccionado = form.rol == "Productor",
+                onClick = { viewModel.onRolChange("Productor") },
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         CampoRegistro(
             etiqueta = "R.U.T",
@@ -136,6 +166,42 @@ fun RegisterPart2(navController: NavController, viewModel: UsuarioViewModel) {
                     Text("OK")
                 }
             }
+        )
+    }
+}
+
+
+// Una tarjeta de rol: azul si está seleccionada, gris si no
+@Composable
+private fun TarjetaRol(
+    texto: String,
+    icono: ImageVector,
+    seleccionado: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val forma = RoundedCornerShape(16.dp)
+    Column(
+        modifier = modifier
+            .clip(forma)
+            .background(if (seleccionado) AzulSuave else Color.White)
+            .border(2.dp, if (seleccionado) AzulPrimario else GrisFila, forma)
+            .clickable(onClick = onClick)
+            .padding(vertical = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = icono,
+            contentDescription = null,
+            tint = if (seleccionado) AzulPrimario else GrisBoton,
+            modifier = Modifier.size(28.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = texto,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = if (seleccionado) AzulPrimario else Color.Black
         )
     }
 }
