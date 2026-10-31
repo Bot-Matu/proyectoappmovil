@@ -42,7 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import cl.duoc.agricol.ui.theme.Inicio
 import androidx.compose.runtime.collectAsState
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
 import androidx.compose.material.icons.outlined.CheckCircle
