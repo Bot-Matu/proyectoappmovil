@@ -31,6 +31,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.duoc.agricol.ui.PanelNotificaciones
 import cl.duoc.agricol.viewmodel.NotificacionViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
@@ -63,7 +66,14 @@ fun Home(
         topBar = {
             TopAppBar(
 
-                title = { Text("Agricolab", style = MaterialTheme.typography.titleMedium) },
+                title = { Text(
+                    text = "Agricolab",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontFamily = Quicksand,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp
+                    )
+                )},
                 actions = {
                     IconButton(onClick = {
                         mostrarCrear = true
