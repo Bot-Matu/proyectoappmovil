@@ -86,7 +86,7 @@ fun PantallaPerfil(viewModel: UsuarioViewModel, onCerrarSesion: () -> Unit = {})
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "Trabajador Agrícola",
+            text = formatearRol(usuario?.rol ?: "Trabajador"),
             color = AzulPrimario,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,

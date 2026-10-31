@@ -13,7 +13,7 @@ import cl.duoc.agricol.model.Usuario
 
 @Database(
     entities = [Usuario::class, Publicacion::class, Mensaje::class, Conversacion::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
