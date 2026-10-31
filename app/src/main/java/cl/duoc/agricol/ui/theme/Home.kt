@@ -33,6 +33,8 @@ import cl.duoc.agricol.viewmodel.NotificacionViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.height
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,12 +78,32 @@ fun Home(
                     )
                 )},
                 actions = {
-                    IconButton(onClick = {
-                        mostrarCrear = true
-                        publicacionSeleccionada = null
-                    }) {
-                        Icon(Icons.Default.Add, contentDescription = "Nuevo")
-                    }
+                    ExtendedFloatingActionButton(
+                        onClick = {
+                            mostrarCrear = true
+                            publicacionSeleccionada = null
+                        },
+                        modifier = Modifier.height(36.dp),
+                        containerColor = VerdeClaroFondo,
+                        elevation = FloatingActionButtonDefaults.elevation(
+                            defaultElevation = 0.dp, // 0.dp lo deja completamente plano
+                            pressedElevation = 0.dp
+                        ),
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = VerdeOscuroTexto
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = "Publicar",
+                                fontWeight = FontWeight.Bold,
+                                color = VerdeOscuroTexto
+                            )
+                        }
+                    )
                     // Botón de notificaciones, con el panel pegado debajo
                     Box {
                         IconButton(onClick = {
