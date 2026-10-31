@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Agricol" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Agricol" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Íconos oscuros en la barra de arriba (hora, batería), porque el fondo de la app es blanco -->
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 </resources>
