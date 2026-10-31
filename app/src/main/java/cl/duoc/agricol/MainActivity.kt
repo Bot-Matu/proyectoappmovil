@@ -10,9 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.room.Room
 import cl.duoc.agricol.repository.AppDatabase
 import cl.duoc.agricol.repository.MensajeRepositoryImpl
+import cl.duoc.agricol.repository.PublicacionRepository
 import cl.duoc.agricol.repository.UsuarioRepository
 import cl.duoc.agricol.ui.theme.Navegacion
+import cl.duoc.agricol.viewmodel.BuscarViewModel
 import cl.duoc.agricol.viewmodel.ConversacionesViewModel
+import cl.duoc.agricol.viewmodel.PublicacionViewModel
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
 
 class MainActivity : ComponentActivity() {
@@ -30,6 +33,10 @@ class MainActivity : ComponentActivity() {
     private val usuarioRepository by lazy { UsuarioRepository(db.usuariosDao()) }
     private val usuarioViewModel by lazy { UsuarioViewModel(usuarioRepository) }
 
+    private val publicacionRepository by lazy { PublicacionRepository(db.publicacionesDao()) }
+    private val publicacionViewModel by lazy { PublicacionViewModel(publicacionRepository) }
+    private val buscarViewModel by lazy { BuscarViewModel(publicacionRepository) }
+
     private val mensajeRepository by lazy { MensajeRepositoryImpl(db.chatDao(), db.usuariosDao()) }
     private val conversacionesViewModel by lazy {
         ConversacionesViewModel(mensajeRepository, usuarioViewModel.usuarioActual)
@@ -43,7 +50,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Navegacion(usuarioViewModel, conversacionesViewModel, mensajeRepository)
+                    Navegacion(
+                        usuarioViewModel,
+                        conversacionesViewModel,
+                        mensajeRepository,
+                        publicacionViewModel,
+                        buscarViewModel
+                    )
                 }
             }
         }

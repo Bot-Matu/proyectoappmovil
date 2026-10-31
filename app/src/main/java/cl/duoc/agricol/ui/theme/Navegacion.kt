@@ -12,7 +12,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import cl.duoc.agricol.repository.MensajeRepository
 import cl.duoc.agricol.ui.PantallaChat
+import cl.duoc.agricol.viewmodel.BuscarViewModel
 import cl.duoc.agricol.viewmodel.ConversacionesViewModel
+import cl.duoc.agricol.viewmodel.PublicacionViewModel
 import cl.duoc.agricol.viewmodel.MensajeViewModel
 import cl.duoc.agricol.viewmodel.MensajeViewModelFactory
 import cl.duoc.agricol.viewmodel.UsuarioViewModel
@@ -21,7 +23,9 @@ import cl.duoc.agricol.viewmodel.UsuarioViewModel
 fun Navegacion(
     usuarioViewModel: UsuarioViewModel,
     conversacionesViewModel: ConversacionesViewModel,
-    mensajeRepository: MensajeRepository
+    mensajeRepository: MensajeRepository,
+    publicacionViewModel: PublicacionViewModel,
+    buscarViewModel: BuscarViewModel
 ) {
     val navController = rememberNavController()
     val sesionCargada by usuarioViewModel.sesionCargada.collectAsState()
@@ -37,7 +41,7 @@ fun Navegacion(
         NavHost(navController, startDestination = destinoInicial) {
             composable("register") { Register(navController, usuarioViewModel) }
             composable("login") { Login(navController, usuarioViewModel) }
-            composable("home") { Home(navController, usuarioViewModel, conversacionesViewModel) }
+            composable("home") { Home(navController, usuarioViewModel, conversacionesViewModel, publicacionViewModel, buscarViewModel) }
             composable("register2") { RegisterPart2(navController, usuarioViewModel) }
 
             // Un chat: "chat/<id de la conversación>/<id de la otra persona>"

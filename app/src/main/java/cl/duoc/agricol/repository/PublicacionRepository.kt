@@ -2,10 +2,23 @@ package cl.duoc.agricol.repository
 
 import cl.duoc.agricol.R
 import cl.duoc.agricol.model.Publicacion
+import kotlinx.coroutines.flow.Flow
 
-class PublicacionRepository {
+class PublicacionRepository(private val dao: PublicacionesDao) {
 
-    fun obtenerPublicaciones(): List<Publicacion> {
+    // Todas las publicaciones guardadas en Room (se actualiza sola)
+    val publicaciones: Flow<List<Publicacion>> = dao.observarTodas()
+
+    suspend fun crear(publicacion: Publicacion) = dao.insert(publicacion)
+
+    // La primera vez que se abre la app, guarda las 3 publicaciones de ejemplo
+    suspend fun cargarEjemplos() {
+        if (dao.contar() == 0) {
+            dao.insertarVarias(ejemplos())
+        }
+    }
+
+    private fun ejemplos(): List<Publicacion> {
         return listOf(
             Publicacion(
                 id = 1,

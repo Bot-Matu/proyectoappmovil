@@ -16,9 +16,6 @@ data class Usuario(
     val nro_documento: String,
     val sesionActiva : Boolean = false
 ){
-    fun info():String{
-        return "Usuario(id=$id, nombre='$nombre',correo='$correo', celular=$celular, rut=$rut,)"
-    }
 
 
 

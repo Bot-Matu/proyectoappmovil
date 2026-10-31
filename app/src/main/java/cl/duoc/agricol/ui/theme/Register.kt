@@ -170,7 +170,8 @@ fun CampoRegistro(
     teclado: KeyboardType = KeyboardType.Text,  // valor por defecto: teclado normal
     esPassword: Boolean = false,                // por defecto NO es contraseña
     prefijo: String? = null,                    // por defecto NO tiene prefijo
-    error: String? = null                       // por defecto NO tiene error
+    error: String? = null,                      // por defecto NO tiene error
+    unaLinea: Boolean = true                    // false = campo de varias líneas (descripción)
 ) {
     Text(
         text = etiqueta,
@@ -184,7 +185,7 @@ fun CampoRegistro(
         onValueChange = alCambiar,
         placeholder = { Text(text = placeholder, color = Color.LightGray) },
         prefix = if (prefijo != null) ({ Text(text = prefijo) }) else null,
-        singleLine = true,
+        singleLine = unaLinea,
         // Si hay error, el campo se pinta en rojo y se muestra el mensaje debajo
         isError = error != null,
         supportingText = { error?.let { Text(it) } },
