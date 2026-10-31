@@ -96,6 +96,9 @@ fun RegisterPart2(navController: NavController, viewModel: UsuarioViewModel) {
             text = "Selecciona tu Rol",
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold
+
+
+
         )
         Spacer(modifier = Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
