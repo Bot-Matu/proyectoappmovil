@@ -11,17 +11,6 @@ val GrisBoton      = Color(0xFF50525F)   // botón "Inicia sesión" / "Continuar
 val GrisFondo      = Color(0xFFF5F5F5)   // fondo de tarjetas
 val TextoSecundario = Color(0xFF6B7280)  // texto gris secundario
 val VerdeEstado    = Color(0xFF22C55E)   // indicador "Conectado/a"
-
-// Mantener por si acaso el tema Material usa estas
-
-val Purple80 = Color(0xFF452D7A)
-val PurpleGrey80 = Color(0xFF100E10)
-val Pink80 = Color(0xFFFD0039)
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
-
 val AzulOscuro = Color(0xFF1E3A8A)
 val AzulSuave = Color(0xFFE8EEFF)
 val FondoApp = Color(0xFFF8FAFC)
@@ -30,4 +19,5 @@ val FondoChat = Color(0xFFEEF2F7)
 val GrisFila = Color(0xFFF1F5F9)
 val RojoAlerta = Color(0xFFD32F2F)
 val RojoSuave = Color(0xFFFFEBEE)
+
 val VerdeEnLinea = Color(0xFF16A34A)
