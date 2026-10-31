@@ -47,6 +47,7 @@ fun Home(
     var mostrarNotificaciones by remember { mutableStateOf(false) }
     var avisoChat by remember { mutableStateOf<String?>(null) }
     val hayNoLeidas by notificacionViewModel.hayNoLeidas.collectAsState()
+    val usuarioActual by usuarioViewModel.usuarioActual.collectAsState()
 
 
     val titulos = listOf("Inicio", "Buscar", "Mensajes", "Perfil")
@@ -124,7 +125,7 @@ fun Home(
             if (mostrarCrear) {
                 PantallaCrearPublicacion(
                     viewModel = publicacionViewModel,
-                    usuario = usuarioViewModel.usuarioActual.value,
+                    usuario = usuarioActual,
                     onVolver = { mostrarCrear = false }
                 )
             } else if (publicacion != null) {
@@ -132,7 +133,7 @@ fun Home(
                     publicacion = publicacion,
                     onVolver = { publicacionSeleccionada = null },
                     onChat = {
-                        val miId = usuarioViewModel.usuarioActual.value?.id
+                        val miId = usuarioActual?.id
                         if (miId == publicacion.creadorId) {
                             avisoChat = "Esta publicación es tuya, no puedes chatear contigo mismo."
                         } else {
