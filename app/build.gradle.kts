@@ -48,6 +48,9 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+    // API
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
     implementation(libs.androidx.material.icons.extended)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
