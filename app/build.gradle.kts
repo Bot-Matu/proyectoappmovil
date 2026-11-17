@@ -40,6 +40,13 @@ android {
     }
 }
 
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events("passed", "failed", "skipped")
+        showStandardStreams = true
+    }
+}
+
 dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(platform(libs.androidx.compose.bom))
@@ -59,6 +66,7 @@ dependencies {
     ksp("androidx.room:room-compiler:$roomVersion")
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
