@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import cl.duoc.agricol.model.Conversacion
 import cl.duoc.agricol.model.ConversacionConNombre
 import cl.duoc.agricol.model.Mensaje
@@ -54,13 +55,21 @@ interface ChatDao {
     @Insert
     suspend fun insertConversacion(conversacion: Conversacion): Long
 
+    // Sincronización con el servidor: actualiza en el lugar (un REPLACE borraría sus mensajes por el CASCADE)
+    @Upsert
+    suspend fun upsertConversacion(conversacion: Conversacion)
+
+    // Ids de los mensajes que ya están en Room (para no pisar su estado LEIDO al sincronizar)
+    @Query("SELECT id FROM mensajes WHERE conversacionId = :conversacionId")
+    suspend fun idsMensajes(conversacionId: Int): List<Int>
+
     // Lista de Mensajes: una fila por chat, con el nombre de la OTRA persona.
     // Solo aparecen los chats que ya tienen al menos un mensaje.
     @Query(
         """
         SELECT c.conversacionId AS conversacionId,
-               u.id AS otroUsuarioId,
-               u.nombre AS nombre,
+               CASE WHEN c.usuario1Id = :yoId THEN c.usuario2Id ELSE c.usuario1Id END AS otroUsuarioId,
+               COALESCE(u.nombre, 'Usuario') AS nombre,
                c.ultimoMensaje AS ultimoMensaje,
                c.ultimoMensajeTiempo AS ultimoMensajeTiempo,
                (SELECT COUNT(*) FROM mensajes m
@@ -68,7 +77,7 @@ interface ChatDao {
                   AND m.emisorId != :yoId
                   AND m.estadoMensaje != 'LEIDO') AS noLeidos
         FROM conversaciones c
-        JOIN usuarios u
+        LEFT JOIN usuarios u
           ON u.id = CASE WHEN c.usuario1Id = :yoId THEN c.usuario2Id ELSE c.usuario1Id END
         WHERE (c.usuario1Id = :yoId OR c.usuario2Id = :yoId)
           AND c.ultimoMensajeTiempo > 0

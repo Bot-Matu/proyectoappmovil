@@ -87,12 +87,12 @@ fun Login(navController: NavController, viewModel: UsuarioViewModel) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Campo Rut
-        Text("Rut", color = AzulEtiqueta, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        // Campo Correo (Xano inicia sesión con el correo)
+        Text("Correo", color = AzulEtiqueta, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         TextField(
             value = rut,
             onValueChange = { rut = it },
-            placeholder = { Text("xx.xxx.xxx-k", color = Color.LightGray) },
+            placeholder = { Text("correo@ejemplo.cl", color = Color.LightGray) },
             singleLine = true,
             colors = TextFieldDefaults.colors(
                 focusedContainerColor   = Color.Transparent,

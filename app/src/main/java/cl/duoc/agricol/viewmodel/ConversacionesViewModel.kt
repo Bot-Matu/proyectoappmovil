@@ -6,6 +6,10 @@ import cl.duoc.agricol.model.ConversacionConNombre
 import cl.duoc.agricol.model.Usuario
 import cl.duoc.agricol.repository.MensajeRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import java.io.IOException
+import retrofit2.HttpException
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -36,11 +40,35 @@ class ConversacionesViewModel(
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // Busca el chat con esa persona (o lo crea) y avisa con su id para navegar
+    // Mientras haya sesión, baja del servidor las conversaciones y mensajes nuevos cada 15 s
+    // (si no hay servidor, repository.sincronizar no hace nada)
+    init {
+        viewModelScope.launch {
+            usuarioActual.collectLatest { yo ->
+                if (yo != null) {
+                    while (true) {
+                        try {
+                            repository.sincronizar(yo.id)
+                        } catch (e: IOException) {
+                        } catch (e: HttpException) {
+                        }
+                        delay(15_000)
+                    }
+                }
+            }
+        }
+    }
+
+    // Busca el chat con esa persona (o lo crea) y avisa con su id para navegar.
+    // Si el servidor falla, no navega.
     fun abrirChat(otroId: Int, onListo: (conversacionId: Int) -> Unit) {
         val yo = usuarioActual.value ?: return
         viewModelScope.launch {
-            onListo(repository.obtenerOCrearConversacion(yo.id, otroId))
+            try {
+                onListo(repository.obtenerOCrearConversacion(yo.id, otroId))
+            } catch (e: IOException) {
+            } catch (e: HttpException) {
+            }
         }
     }
 }

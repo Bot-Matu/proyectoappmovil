@@ -10,6 +10,10 @@ interface UsuarioDao {
     @Insert
     suspend fun insertar(usuario: Usuario)
 
+    // Guarda (o actualiza) el usuario que viene del servidor, conservando el id de Xano
+    @Upsert
+    suspend fun upsert(usuario: Usuario)
+
     // Devuelve el usuario con ese RUT, o null si no existe
     @Query("SELECT * FROM usuarios WHERE rut = :rut LIMIT 1")
     suspend fun buscarPorRut(rut: String): Usuario?

@@ -15,5 +15,6 @@ data class Usuario(
     val rut: String,
     val nro_documento: String,
     val rol: String = "Trabajador",   // "Trabajador" o "Productor"
-    val sesionActiva : Boolean = false
+    val sesionActiva : Boolean = false,
+    val token: String = ""            // authToken de Xano (vacío si el usuario es solo local)
 )

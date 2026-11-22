@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.IOException
+import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -21,8 +23,19 @@ import java.util.Locale
 class PublicacionViewModel(private val repository: PublicacionRepository) : ViewModel() {
 
     init {
-        // Si la base está vacía, guarda las publicaciones de ejemplo
-        viewModelScope.launch { repository.cargarEjemplos() }
+        actualizar()
+    }
+
+    // Trae las publicaciones del servidor (o los ejemplos si no hay servidor).
+    // Si no hay conexión, se queda con lo que ya había en Room.
+    fun actualizar() {
+        viewModelScope.launch {
+            try {
+                repository.sincronizar()
+            } catch (e: IOException) {
+            } catch (e: HttpException) {
+            }
+        }
     }
 
     // ---------- Lista de Inicio ----------
@@ -54,6 +67,14 @@ class PublicacionViewModel(private val repository: PublicacionRepository) : View
     // Es true cuando la publicación ya se guardó (la pantalla muestra el modal)
     private val _publicado = MutableStateFlow(false)
     val publicado: StateFlow<Boolean> = _publicado
+
+    // Texto del error si el servidor no pudo guardar la publicación (null = sin error)
+    private val _errorPublicar = MutableStateFlow<String?>(null)
+    val errorPublicar: StateFlow<String?> = _errorPublicar
+
+    fun cerrarErrorPublicar() {
+        _errorPublicar.value = null
+    }
 
     // Cada vez que se edita un campo, se guarda el valor y se borra su error
     fun onTituloChange(valor: String) {
@@ -196,8 +217,14 @@ class PublicacionViewModel(private val repository: PublicacionRepository) : View
         )
 
         viewModelScope.launch {
-            repository.crear(publicacion)
-            _publicado.value = true
+            try {
+                repository.crear(publicacion)
+                _publicado.value = true
+            } catch (e: IOException) {
+                _errorPublicar.value = "No hay conexión con el servidor"
+            } catch (e: HttpException) {
+                _errorPublicar.value = "No se pudo guardar la publicación, intenta más tarde"
+            }
         }
     }
 

@@ -33,6 +33,7 @@ fun PantallaCrearPublicacion(
     val form by viewModel.form.collectAsState()
     val errors by viewModel.errors.collectAsState()
     val publicado by viewModel.publicado.collectAsState()
+    val errorPublicar by viewModel.errorPublicar.collectAsState()
     val categorias = listOf("Poda", "Riego", "Cosecha")
 
     Column(
@@ -179,6 +180,18 @@ fun PantallaCrearPublicacion(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+    }
+
+    // Modal de error (el servidor no guardó la publicación)
+    errorPublicar?.let { mensaje ->
+        AlertDialog(
+            onDismissRequest = { viewModel.cerrarErrorPublicar() },
+            title = { Text("No se pudo publicar") },
+            text = { Text(mensaje) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.cerrarErrorPublicar() }) { Text("OK") }
+            }
+        )
     }
 
     // Modal de confirmación
