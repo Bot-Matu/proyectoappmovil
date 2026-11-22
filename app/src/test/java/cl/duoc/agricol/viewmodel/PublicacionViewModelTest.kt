@@ -165,6 +165,15 @@ class PublicacionViewModelTest {
             guardadas.value = publicaciones + guardadas.value
         }
 
+        override suspend fun upsertVarias(publicaciones: List<Publicacion>) {
+            val ids = publicaciones.map { it.id }
+            guardadas.value = publicaciones + guardadas.value.filter { it.id !in ids }
+        }
+
+        override suspend fun borrarExcepto(ids: List<Int>) {
+            guardadas.value = guardadas.value.filter { it.id in ids }
+        }
+
         // Estos dos no se usan en las pruebas, pero la interfaz los exige
         override suspend fun update(publicacion: Publicacion) {}
 

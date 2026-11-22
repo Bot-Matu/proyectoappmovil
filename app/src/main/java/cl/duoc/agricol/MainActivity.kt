@@ -9,7 +9,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.room.Room
 import cl.duoc.agricol.repository.AppDatabase
+import cl.duoc.agricol.remote.RetrofitClient
+import cl.duoc.agricol.repository.AuthRepositoryImpl
+import cl.duoc.agricol.repository.ChatRepositoryImpl
 import cl.duoc.agricol.repository.MensajeRepositoryImpl
+import cl.duoc.agricol.repository.PublicacionesRemotoRepositoryImpl
 import cl.duoc.agricol.repository.PublicacionRepository
 import cl.duoc.agricol.repository.UsuarioRepository
 import cl.duoc.agricol.ui.theme.Navegacion
@@ -31,14 +35,24 @@ class MainActivity : ComponentActivity() {
             .fallbackToDestructiveMigration() // mientras desarrollan: si cambia el esquema, recrea la BD
             .build()
     }
-    private val usuarioRepository by lazy { UsuarioRepository(db.usuariosDao()) }
+    private val usuarioRepository by lazy { UsuarioRepository(
+            db.usuariosDao(),
+            AuthRepositoryImpl(RetrofitClient.crearAuthApi())
+        ) }
     private val usuarioViewModel by lazy { UsuarioViewModel(usuarioRepository) }
 
-    private val publicacionRepository by lazy { PublicacionRepository(db.publicacionesDao()) }
+    private val publicacionRepository by lazy { PublicacionRepository(
+            db.publicacionesDao(),
+            PublicacionesRemotoRepositoryImpl(RetrofitClient.crearApi())
+        ) }
     private val publicacionViewModel by lazy { PublicacionViewModel(publicacionRepository) }
     private val buscarViewModel by lazy { BuscarViewModel(publicacionRepository) }
 
-    private val mensajeRepository by lazy { MensajeRepositoryImpl(db.chatDao(), db.usuariosDao()) }
+    private val mensajeRepository by lazy { MensajeRepositoryImpl(
+            db.chatDao(),
+            db.usuariosDao(),
+            ChatRepositoryImpl(RetrofitClient.crearChatApi())
+        ) }
     private val conversacionesViewModel by lazy {
         ConversacionesViewModel(mensajeRepository, usuarioViewModel.usuarioActual)
     }

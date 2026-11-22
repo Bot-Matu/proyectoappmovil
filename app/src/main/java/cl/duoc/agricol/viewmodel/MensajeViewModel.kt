@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import cl.duoc.agricol.model.Estado
 import cl.duoc.agricol.model.Mensaje
 import cl.duoc.agricol.repository.MensajeRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.io.IOException
+import retrofit2.HttpException
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -38,6 +41,18 @@ class MensajeViewModel(
     init {
         viewModelScope.launch {
             _nombreOtro.value = mensajeRepository.nombreDeUsuario(otroUsuarioId)
+        }
+        // Con el chat abierto, revisa cada 4 s si llegaron mensajes nuevos al servidor
+        viewModelScope.launch {
+            while (true) {
+                try {
+                    mensajeRepository.sincronizarMensajes(conversacionId)
+                    mensajeRepository.marcarComoLeidos(conversacionId, emisorIdActual)
+                } catch (e: IOException) {
+                } catch (e: HttpException) {
+                }
+                delay(4_000)
+            }
         }
     }
 

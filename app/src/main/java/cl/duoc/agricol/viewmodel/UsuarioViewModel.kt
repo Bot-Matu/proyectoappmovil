@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+import java.io.IOException
+import retrofit2.HttpException
 
 class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() {
 
@@ -123,6 +125,7 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
             if (repository.existeRut(rutLimpio)) {
                 _mensajeModal.value = "Ya existe un usuario registrado con ese RUT"
             } else {
+              try {
                 val usuario = Usuario(
                     nombre = f.nombre,
                     celular = f.celular.toInt(),
@@ -135,6 +138,15 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
                 repository.registrar(usuario)
                 _registroExitoso.value = true
                 _mensajeModal.value = "Tu cuenta fue creada correctamente"
+            } catch (e: HttpException) {
+                _mensajeModal.value = if (e.code() in 400..499) {
+                    "Ya existe una cuenta con ese correo o RUT"
+                } else {
+                    "El servidor no respondió, intenta más tarde"
+                }
+            } catch (e: IOException) {
+                _mensajeModal.value = "No hay conexión con el servidor"
+            }
             }
         }
     }
@@ -178,14 +190,27 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
     // Busca al usuario en Room; si existe, ejecuta onExito (navega a Home)
     fun iniciarSesion(rut: String, contrasena: String, onExito: () -> Unit) {
         if (rut.isBlank() || contrasena.isBlank()) {
-            _errorLogin.value = "Ingresa tu RUT y tu contraseña"
+            _errorLogin.value = if (repository.usaServidor) "Ingresa tu correo y tu contraseña"
+                                else "Ingresa tu RUT y tu contraseña"
             return
         }
 
         viewModelScope.launch {
             _cargando.value = true
             delay(1000) // simula el tiempo de verificación, como en el ejemplo del profe
-            val usuario = repository.iniciarSesion(limpiarRut(rut), contrasena)
+            // Con servidor se entra con el correo; sin servidor, con el RUT
+            val identificador = if (repository.usaServidor) rut.trim() else limpiarRut(rut)
+            var mensajeError = if (repository.usaServidor) "Correo o contraseña incorrectos"
+                               else "RUT o contraseña incorrectos"
+            val usuario = try {
+                repository.iniciarSesion(identificador, contrasena)
+            } catch (e: HttpException) {
+                if (e.code() >= 500) mensajeError = "El servidor no respondió, intenta más tarde"
+                null
+            } catch (e: IOException) {
+                mensajeError = "No hay conexión con el servidor"
+                null
+            }
             _cargando.value = false
 
             if (usuario != null) {
@@ -193,7 +218,7 @@ class UsuarioViewModel(private val repository: UsuarioRepository) : ViewModel() 
                 _usuarioActual.value = usuario
                 onExito()
             } else {
-                _errorLogin.value = "RUT o contraseña incorrectos"
+                _errorLogin.value = mensajeError
             }
         }
     }

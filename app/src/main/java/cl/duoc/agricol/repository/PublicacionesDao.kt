@@ -20,6 +20,14 @@ interface PublicacionesDao {
     @Insert
     suspend fun insertarVarias(publicaciones: List<Publicacion>)
 
+    // Sincronización con el servidor: actualiza las que existen y agrega las nuevas
+    @Upsert
+    suspend fun upsertVarias(publicaciones: List<Publicacion>)
+
+    // Quita de Room las que ya no existen en el servidor
+    @Query("DELETE FROM publicacion WHERE id NOT IN (:ids)")
+    suspend fun borrarExcepto(ids: List<Int>)
+
     @Update
     suspend fun update(publicacion: Publicacion)
 

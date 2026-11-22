@@ -179,6 +179,11 @@ class UsuarioViewModelTest {
             usuarios.add(usuario.copy(id = usuarios.size + 1))
         }
 
+        override suspend fun upsert(usuario: Usuario) {
+            usuarios.removeAll { it.id == usuario.id }
+            usuarios.add(usuario)
+        }
+
         override suspend fun buscarPorRut(rut: String): Usuario? =
             usuarios.find { it.rut == rut }
 
