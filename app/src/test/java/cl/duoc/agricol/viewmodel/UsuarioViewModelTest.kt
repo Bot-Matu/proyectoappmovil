@@ -1,9 +1,8 @@
-package cl.duoc.agricol
+package cl.duoc.agricol.viewmodel
 
 import cl.duoc.agricol.model.Usuario
 import cl.duoc.agricol.repository.UsuarioDao
 import cl.duoc.agricol.repository.UsuarioRepository
-import cl.duoc.agricol.viewmodel.UsuarioViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
