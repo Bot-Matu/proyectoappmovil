@@ -1,13 +1,22 @@
 package cl.duoc.agricol.repository
 
+import android.util.Log
 import cl.duoc.agricol.model.Conversacion
 import cl.duoc.agricol.model.ConversacionConNombre
 import cl.duoc.agricol.model.Mensaje
-import cl.duoc.agricol.model.Usuario
-import kotlinx.coroutines.flow.Flow
-import java.io.IOException
-import retrofit2.HttpException
 import cl.duoc.agricol.model.MensajeRemoto
+import cl.duoc.agricol.model.Usuario
+import com.google.gson.JsonParseException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withTimeoutOrNull
+import retrofit2.HttpException
+import java.io.IOException
 
 interface MensajeRepository {
     fun obtenerMensajesPorConversacion(conversacionId: Int): Flow<List<Mensaje>>
@@ -22,30 +31,60 @@ interface MensajeRepository {
     suspend fun marcarComoLeidos(conversacionId: Int, usuarioId: Int)
     suspend fun nombreDeUsuario(usuarioId: Int): String
 
-    // Traen lo nuevo del servidor a Room (sin servidor no hacen nada)
+    // Ya no hacen falta (con servidor los flujos leen directo de Xano); se dejan para no tocar los ViewModels
     suspend fun sincronizar(usuarioId: Int) {}
     suspend fun sincronizarMensajes(conversacionId: Int) {}
 }
 
-// Room sigue alimentando las pantallas. Si recibe el ChatRepository remoto, las conversaciones
-// y mensajes se envían a Xano y lo nuevo se baja a Room con sincronizar().
+// Con ChatRepository remoto, conversaciones y mensajes se leen DIRECTO de Xano (consulta cada
+// pocos segundos) y no pasan por Room. Sin remoto funciona como antes, solo con Room.
 class MensajeRepositoryImpl(
     private val chatDao: ChatDao,
     private val usuarioDao: UsuarioDao,
     private val remoto: ChatRepository? = null
 ) : MensajeRepository {
 
-    override fun obtenerMensajesPorConversacion(conversacionId: Int): Flow<List<Mensaje>> =
-        chatDao.getMessagesForConversation(conversacionId)
+    // Para refrescar la lista de inmediato después de enviar
+    private val refrescar = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    // Guarda el mensaje y actualiza el "último mensaje" de la conversación (tu @Transaction)
+    // Mensajes que no se pudieron enviar (se muestran con ERROR hasta que se cierre la app)
+    private val fallidos = MutableStateFlow<List<Mensaje>>(emptyList())
+
+    // Hasta qué hora (de los mensajes del otro) ya se leyó cada conversación
+    private val leidoHasta = MutableStateFlow<Map<Int, Long>>(emptyMap())
+
+    override fun obtenerMensajesPorConversacion(conversacionId: Int): Flow<List<Mensaje>> {
+        if (remoto == null) return chatDao.getMessagesForConversation(conversacionId)
+
+        val delServidor = flow {
+            while (true) {
+                try {
+                    val lista = remoto.obtenerMensajes(conversacionId).map { it.aMensaje() }
+                    Log.d("AgricolChat", "conv $conversacionId: ${lista.size} mensajes en Xano")
+                    emit(lista)
+                } catch (e: IOException) {
+                    Log.w("AgricolChat", "mensajes sin red", e)
+                } catch (e: HttpException) {
+                    Log.w("AgricolChat", "mensajes HTTP ${e.code()}", e)
+                } catch (e: JsonParseException) {
+                    Log.e("AgricolChat", "mensajes: respuesta no válida", e)
+                }
+                // Espera 3 s o hasta que se envíe un mensaje
+                withTimeoutOrNull(3_000) { refrescar.first() }
+            }
+        }
+        return combine(delServidor, fallidos) { lista, errores ->
+            (lista + errores.filter { it.conversacionId == conversacionId }).sortedBy { it.tiempo }
+        }
+    }
+
     override suspend fun enviarMensaje(mensaje: Mensaje) {
         if (remoto == null) {
             chatDao.sendMessageAndUpdateConversation(mensaje)
             return
         }
         try {
-            val enviado = remoto.enviarMensaje(
+            remoto.enviarMensaje(
                 MensajeRemoto(
                     conversacionId = mensaje.conversacionId,
                     emisorId = mensaje.emisorId,
@@ -54,21 +93,18 @@ class MensajeRepositoryImpl(
                     estadoMensaje = mensaje.estadoMensaje
                 )
             )
-            // Queda en Room con el id de Xano
-            chatDao.sendMessageAndUpdateConversation(mensaje.copy(id = enviado.id))
+            refrescar.tryEmit(Unit)
         } catch (e: IOException) {
-            guardarConError(mensaje)
+            marcarFallido(mensaje)
         } catch (e: HttpException) {
-            guardarConError(mensaje)
+            Log.w("AgricolChat", "enviar HTTP ${e.code()}", e)
+            marcarFallido(mensaje)
         }
     }
 
-    // Si no se pudo enviar, el mensaje queda en Room marcado con ERROR (id negativo para no chocar con los de Xano)
-    private suspend fun guardarConError(mensaje: Mensaje) {
+    private fun marcarFallido(mensaje: Mensaje) {
         val idLocal = -(mensaje.tiempo % 1_000_000_000L).toInt() - 1
-        chatDao.sendMessageAndUpdateConversation(
-            mensaje.copy(id = idLocal, estadoMensaje = "ERROR")
-        )
+        fallidos.value = fallidos.value + mensaje.copy(id = idLocal, estadoMensaje = "ERROR")
     }
 
     override suspend fun actualizarEstadoMensaje(mensajeId: Int, nuevoEstado: String) =
@@ -77,92 +113,104 @@ class MensajeRepositoryImpl(
     override suspend fun eliminarMensaje(mensaje: Mensaje) =
         chatDao.deleteMessage(mensaje)
 
-    override fun obtenerConversaciones(usuarioId: Int): Flow<List<ConversacionConNombre>> =
-        chatDao.observarConversaciones(usuarioId)
+    override fun obtenerConversaciones(usuarioId: Int): Flow<List<ConversacionConNombre>> {
+        if (remoto == null) return chatDao.observarConversaciones(usuarioId)
+
+        val delServidor = flow {
+            while (true) {
+                try {
+                    emit(armarConversaciones(remoto, usuarioId))
+                } catch (e: IOException) {
+                    Log.w("AgricolChat", "conversaciones sin red", e)
+                } catch (e: HttpException) {
+                    Log.w("AgricolChat", "conversaciones HTTP ${e.code()}", e)
+                } catch (e: JsonParseException) {
+                    Log.e("AgricolChat", "conversaciones: respuesta no válida", e)
+                }
+                delay(5_000)
+            }
+        }
+        // Al leer un chat, se recalcula el contador de no leídos sin esperar la próxima consulta
+        return combine(delServidor, leidoHasta) { lista, leidos ->
+            lista.map { c -> c.copy(noLeidos = contarNoLeidos(c, leidos)) }
+        }
+    }
+
+    // Una fila por conversación con al menos un mensaje, la más reciente primero
+    private suspend fun armarConversaciones(api: ChatRepository, yo: Int): List<ConversacionConNombre> {
+        val conversaciones = api.obtenerConversaciones(yo)
+        val mensajes = api.obtenerTodosLosMensajes().groupBy { it.conversacionId }
+        Log.d("AgricolChat", "usuario $yo: ${conversaciones.size} conversaciones en Xano")
+        // Se guardan las horas de los mensajes del otro para calcular los no leídos
+        tiemposDelOtro = mensajes.mapValues { (_, lista) -> lista.filter { it.emisorId != yo }.map { it.tiempo } }
+        return conversaciones.mapNotNull { c ->
+            val propios = mensajes[c.id].orEmpty()
+            val ultimo = propios.maxByOrNull { it.tiempo } ?: return@mapNotNull null
+            val otroId = if (c.usuario1Id == yo) c.usuario2Id else c.usuario1Id
+            ConversacionConNombre(
+                conversacionId = c.id,
+                otroUsuarioId = otroId,
+                nombre = usuarioDao.nombrePorId(otroId) ?: "Usuario",
+                ultimoMensaje = ultimo.contenido,
+                ultimoMensajeTiempo = ultimo.tiempo,
+                noLeidos = propios.count { it.emisorId != yo && it.tiempo > (leidoHasta.value[c.id] ?: 0L) }
+            )
+        }.sortedByDescending { it.ultimoMensajeTiempo }
+    }
+
+    // Mensajes del otro posteriores a la última vez que se abrió el chat
+    @Volatile private var tiemposDelOtro: Map<Int, List<Long>> = emptyMap()
+    private fun contarNoLeidos(c: ConversacionConNombre, leidos: Map<Int, Long>): Int {
+        val tiempos = tiemposDelOtro[c.conversacionId] ?: return c.noLeidos
+        val limite = leidos[c.conversacionId] ?: 0L
+        return tiempos.count { it > limite }
+    }
 
     override fun obtenerContactos(usuarioId: Int): Flow<List<Usuario>> =
         usuarioDao.observarOtros(usuarioId)
 
     override suspend fun obtenerOCrearConversacion(usuarioId: Int, otroId: Int): Int {
         if (remoto != null) {
-            // Primero se trae lo que ya existe en el servidor; si no hay red se usa lo de Room
-            try {
-                sincronizarConversaciones(usuarioId)
-            } catch (e: IOException) {
-            } catch (e: HttpException) {
+            // Si ya hay una conversación entre los dos en Xano se usa esa; si no, se crea
+            val existente = remoto.obtenerConversaciones(usuarioId).firstOrNull {
+                (it.usuario1Id == usuarioId && it.usuario2Id == otroId) ||
+                        (it.usuario1Id == otroId && it.usuario2Id == usuarioId)
             }
+            return existente?.id ?: remoto.crearConversacion(usuarioId, otroId).id
         }
         val existente = chatDao.buscarConversacion(usuarioId, otroId)
         if (existente != null) return existente.conversacionId
-        if (remoto != null) {
-            val creada = remoto.crearConversacion(usuarioId, otroId)
-            chatDao.upsertConversacion(
-                Conversacion(
-                    conversacionId = creada.id,
-                    usuario1Id = creada.usuario1Id,
-                    usuario2Id = creada.usuario2Id
-                )
-            )
-            return creada.id
-        }
         return chatDao.insertConversacion(
             Conversacion(usuario1Id = usuarioId, usuario2Id = otroId)
         ).toInt()
     }
 
-    override suspend fun marcarComoLeidos(conversacionId: Int, usuarioId: Int) =
-        chatDao.marcarLeidos(conversacionId, usuarioId)
+    override suspend fun marcarComoLeidos(conversacionId: Int, usuarioId: Int) {
+        if (remoto == null) {
+            chatDao.marcarLeidos(conversacionId, usuarioId)
+            return
+        }
+        // Xano no tiene endpoint para cambiar el estado: se recuerda en el teléfono hasta qué mensaje se leyó
+        try {
+            val delOtro = remoto.obtenerMensajes(conversacionId)
+                .filter { it.emisorId != usuarioId }.map { it.tiempo }
+            val ultimo = delOtro.maxOrNull() ?: return
+            leidoHasta.value = leidoHasta.value + (conversacionId to ultimo)
+        } catch (e: IOException) {
+        } catch (e: HttpException) {
+        } catch (e: JsonParseException) {
+        }
+    }
 
     override suspend fun nombreDeUsuario(usuarioId: Int): String =
         usuarioDao.nombrePorId(usuarioId) ?: "Usuario"
 
-    // ---------- Sincronización con Xano ----------
-
-    // Conversaciones del usuario + sus mensajes (lo que alimenta la pantalla Mensajes)
-    override suspend fun sincronizar(usuarioId: Int) {
-        if (remoto == null) return
-        sincronizarConversaciones(usuarioId).forEach { sincronizarMensajes(it) }
-    }
-
-    // Devuelve los ids de las conversaciones del usuario ya guardadas en Room
-    private suspend fun sincronizarConversaciones(usuarioId: Int): List<Int> {
-        if (remoto == null) return emptyList()
-        return remoto.obtenerConversaciones(usuarioId).map { r ->
-            // Se conserva el último mensaje que ya calculó Room
-            val local = chatDao.buscarConversacion(r.usuario1Id, r.usuario2Id)
-            chatDao.upsertConversacion(
-                Conversacion(
-                    conversacionId = r.id,
-                    usuario1Id = r.usuario1Id,
-                    usuario2Id = r.usuario2Id,
-                    ultimoMensaje = local?.ultimoMensaje ?: r.ultimoMensaje,
-                    ultimoMensajeTiempo = maxOf(local?.ultimoMensajeTiempo ?: 0L, r.ultimoMensajeTiempo)
-                )
-            )
-            r.id
-        }
-    }
-
-    // Guarda en Room solo los mensajes nuevos (los que ya están conservan su estado)
-    override suspend fun sincronizarMensajes(conversacionId: Int) {
-        if (remoto == null) return
-        val remotos = remoto.obtenerMensajes(conversacionId)
-        val yaGuardados = chatDao.idsMensajes(conversacionId).toSet()
-        remotos.filter { it.id !in yaGuardados }.forEach {
-            chatDao.insertMessage(
-                Mensaje(
-                    id = it.id,
-                    conversacionId = it.conversacionId,
-                    emisorId = it.emisorId,
-                    contenido = it.contenido,
-                    tiempo = it.tiempo,
-                    estadoMensaje = it.estadoMensaje
-                )
-            )
-        }
-        // La lista de Mensajes muestra el último mensaje de cada chat
-        remotos.filter { it.tiempo > 0 }.maxByOrNull { it.tiempo }?.let {
-            chatDao.updateLastMessage(conversacionId, it.contenido, it.tiempo)
-        }
-    }
+    private fun MensajeRemoto.aMensaje() = Mensaje(
+        id = id,
+        conversacionId = conversacionId,
+        emisorId = emisorId,
+        contenido = contenido,
+        tiempo = tiempo,
+        estadoMensaje = estadoMensaje
+    )
 }

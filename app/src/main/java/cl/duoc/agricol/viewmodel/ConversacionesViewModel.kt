@@ -8,6 +8,7 @@ import cl.duoc.agricol.repository.MensajeRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import android.util.Log
 import java.io.IOException
 import retrofit2.HttpException
 import kotlinx.coroutines.flow.SharingStarted
@@ -50,7 +51,11 @@ class ConversacionesViewModel(
                         try {
                             repository.sincronizar(yo.id)
                         } catch (e: IOException) {
+                            Log.w("AgricolChat", "sync conversaciones sin red", e)
                         } catch (e: HttpException) {
+                            Log.w("AgricolChat", "sync conversaciones HTTP ${e.code()}", e)
+                        } catch (e: RuntimeException) {
+                            Log.e("AgricolChat", "sync conversaciones: respuesta no válida", e)
                         }
                         delay(15_000)
                     }

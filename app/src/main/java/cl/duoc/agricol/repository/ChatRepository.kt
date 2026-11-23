@@ -9,6 +9,9 @@ interface ChatRepository {
     suspend fun crearConversacion(usuario1Id: Int, usuario2Id: Int): ConversacionRemota
     suspend fun obtenerMensajes(conversacionId: Int): List<MensajeRemoto>
     suspend fun enviarMensaje(mensaje: MensajeRemoto): MensajeRemoto
+
+    // Todos los mensajes en una sola llamada (para armar la lista de conversaciones)
+    suspend fun obtenerTodosLosMensajes(): List<MensajeRemoto>
 }
 
 class ChatRepositoryImpl(
@@ -32,4 +35,7 @@ class ChatRepositoryImpl(
 
     override suspend fun enviarMensaje(mensaje: MensajeRemoto): MensajeRemoto =
         api.enviarMensaje(mensaje)
+
+    override suspend fun obtenerTodosLosMensajes(): List<MensajeRemoto> =
+        api.obtenerMensajes()
 }

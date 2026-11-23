@@ -8,6 +8,7 @@ import cl.duoc.agricol.model.Mensaje
 import cl.duoc.agricol.repository.MensajeRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import android.util.Log
 import java.io.IOException
 import retrofit2.HttpException
 import kotlinx.coroutines.flow.SharingStarted
@@ -49,7 +50,11 @@ class MensajeViewModel(
                     mensajeRepository.sincronizarMensajes(conversacionId)
                     mensajeRepository.marcarComoLeidos(conversacionId, emisorIdActual)
                 } catch (e: IOException) {
+                    Log.w("AgricolChat", "sync mensajes sin red", e)
                 } catch (e: HttpException) {
+                    Log.w("AgricolChat", "sync mensajes HTTP ${e.code()}", e)
+                } catch (e: RuntimeException) {
+                    Log.e("AgricolChat", "sync mensajes: respuesta no válida", e)
                 }
                 delay(4_000)
             }
