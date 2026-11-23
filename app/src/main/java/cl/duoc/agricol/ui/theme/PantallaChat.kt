@@ -47,13 +47,21 @@ fun PantallaChat(navController: NavController, viewModel: MensajeViewModel) {
         if (mensajes.isNotEmpty()) listState.animateScrollToItem(mensajes.lastIndex)
     }
 
+
     Scaffold(
+
+
         topBar = {
+
+
             EncabezadoChat(
+
+
                 nombre = nombre,
                 onVolver = { navController.popBackStack() }
             )
         }
+
     ) { padding ->
         Column(
             modifier = Modifier
@@ -133,7 +141,11 @@ fun PantallaChat(navController: NavController, viewModel: MensajeViewModel) {
 // Encabezado: flecha, avatar con la inicial y nombre de la otra persona
 @Composable
 private fun EncabezadoChat(nombre: String, onVolver: () -> Unit) {
-    Column(modifier = Modifier.background(Color.White)) {
+    Column(
+        modifier = Modifier
+            .background(Color.White)
+            .statusBarsPadding()
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
