@@ -44,6 +44,16 @@ class MensajeRepositoryImpl(
     private val remoto: ChatRepository? = null
 ) : MensajeRepository {
 
+    // Xano limita las peticiones (HTTP 429): pocas consultas y, si responde 429, se espera más
+    private companion object {
+        const val CADA_CHAT_MS = 6_000L
+        const val CADA_LISTA_MS = 20_000L
+        const val ESPERA_429_MS = 30_000L
+    }
+
+    // Últimos mensajes bajados de cada conversación (así marcar como leído no gasta otra petición)
+    @Volatile private var ultimosPorConversacion: Map<Int, List<MensajeRemoto>> = emptyMap()
+
     // Para refrescar la lista de inmediato después de enviar
     private val refrescar = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -58,19 +68,22 @@ class MensajeRepositoryImpl(
 
         val delServidor = flow {
             while (true) {
+                var espera = CADA_CHAT_MS
                 try {
-                    val lista = remoto.obtenerMensajes(conversacionId).map { it.aMensaje() }
-                    Log.d("AgricolChat", "conv $conversacionId: ${lista.size} mensajes en Xano")
-                    emit(lista)
+                    val crudos = remoto.obtenerMensajes(conversacionId)
+                    ultimosPorConversacion = ultimosPorConversacion + (conversacionId to crudos)
+                    Log.d("AgricolChat", "conv $conversacionId: ${crudos.size} mensajes en Xano")
+                    emit(crudos.map { it.aMensaje() })
                 } catch (e: IOException) {
                     Log.w("AgricolChat", "mensajes sin red", e)
                 } catch (e: HttpException) {
                     Log.w("AgricolChat", "mensajes HTTP ${e.code()}", e)
+                    if (e.code() == 429) espera = ESPERA_429_MS
                 } catch (e: JsonParseException) {
                     Log.e("AgricolChat", "mensajes: respuesta no válida", e)
                 }
-                // Espera 3 s o hasta que se envíe un mensaje
-                withTimeoutOrNull(3_000) { refrescar.first() }
+                // Espera el intervalo o hasta que se envíe un mensaje
+                withTimeoutOrNull(espera) { refrescar.first() }
             }
         }
         return combine(delServidor, fallidos) { lista, errores ->
@@ -118,16 +131,18 @@ class MensajeRepositoryImpl(
 
         val delServidor = flow {
             while (true) {
+                var espera = CADA_LISTA_MS
                 try {
                     emit(armarConversaciones(remoto, usuarioId))
                 } catch (e: IOException) {
                     Log.w("AgricolChat", "conversaciones sin red", e)
                 } catch (e: HttpException) {
                     Log.w("AgricolChat", "conversaciones HTTP ${e.code()}", e)
+                    if (e.code() == 429) espera = ESPERA_429_MS
                 } catch (e: JsonParseException) {
                     Log.e("AgricolChat", "conversaciones: respuesta no válida", e)
                 }
-                delay(5_000)
+                delay(espera)
             }
         }
         // Al leer un chat, se recalcula el contador de no leídos sin esperar la próxima consulta
@@ -190,15 +205,12 @@ class MensajeRepositoryImpl(
             chatDao.marcarLeidos(conversacionId, usuarioId)
             return
         }
-        // Xano no tiene endpoint para cambiar el estado: se recuerda en el teléfono hasta qué mensaje se leyó
-        try {
-            val delOtro = remoto.obtenerMensajes(conversacionId)
-                .filter { it.emisorId != usuarioId }.map { it.tiempo }
-            val ultimo = delOtro.maxOrNull() ?: return
+        // Xano no tiene endpoint para cambiar el estado: se recuerda en el teléfono hasta qué mensaje se leyó.
+        // Usa los mensajes que ya se bajaron, sin hacer otra petición.
+        val ultimo = ultimosPorConversacion[conversacionId].orEmpty()
+            .filter { it.emisorId != usuarioId }.maxOfOrNull { it.tiempo } ?: return
+        if (ultimo > (leidoHasta.value[conversacionId] ?: 0L)) {
             leidoHasta.value = leidoHasta.value + (conversacionId to ultimo)
-        } catch (e: IOException) {
-        } catch (e: HttpException) {
-        } catch (e: JsonParseException) {
         }
     }
 

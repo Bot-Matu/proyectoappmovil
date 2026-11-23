@@ -43,22 +43,7 @@ class MensajeViewModel(
         viewModelScope.launch {
             _nombreOtro.value = mensajeRepository.nombreDeUsuario(otroUsuarioId)
         }
-        // Con el chat abierto, revisa cada 4 s si llegaron mensajes nuevos al servidor
-        viewModelScope.launch {
-            while (true) {
-                try {
-                    mensajeRepository.sincronizarMensajes(conversacionId)
-                    mensajeRepository.marcarComoLeidos(conversacionId, emisorIdActual)
-                } catch (e: IOException) {
-                    Log.w("AgricolChat", "sync mensajes sin red", e)
-                } catch (e: HttpException) {
-                    Log.w("AgricolChat", "sync mensajes HTTP ${e.code()}", e)
-                } catch (e: RuntimeException) {
-                    Log.e("AgricolChat", "sync mensajes: respuesta no válida", e)
-                }
-                delay(4_000)
-            }
-        }
+        // Los mensajes nuevos llegan solos por el flujo del repositorio (una sola consulta periódica)
     }
 
     fun enviarMensaje(texto: String) {
