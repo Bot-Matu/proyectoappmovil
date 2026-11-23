@@ -36,6 +36,14 @@ fun PanelNotificaciones(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
         HorizontalDivider(color = AzulSuave)
+        if (notificaciones.isEmpty()) {
+            Text(
+                text = "No tienes notificaciones",
+                fontSize = 13.sp,
+                color = TextoSecundario,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
 
         notificaciones.forEach { notificacion ->
             Column(

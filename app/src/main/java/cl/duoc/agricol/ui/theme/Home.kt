@@ -35,6 +35,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.height
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import cl.duoc.agricol.ui.Notificador
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +58,28 @@ fun Home(
     var avisoChat by remember { mutableStateOf<String?>(null) }
     val hayNoLeidas by notificacionViewModel.hayNoLeidas.collectAsState()
     val usuarioActual by usuarioViewModel.usuarioActual.collectAsState()
+    val context = LocalContext.current
+    val notificaciones by notificacionViewModel.notificaciones.collectAsState()
+    val publicado by publicacionViewModel.publicado.collectAsState()
+
+    // Pide el permiso de notificaciones al entrar (solo Android 13 o superior)
+    val permisoNotificaciones = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { }
+
+    LaunchedEffect(Unit) {
+        if (!Notificador.tienePermiso(context)) {
+            permisoNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    // Al publicar una oferta: notificación del sistema + aviso en la campanita
+    LaunchedEffect(publicado) {
+        if (publicado) {
+            Notificador.mostrar(context, "Publicación creada", "Tu oferta ya aparece en Inicio y en Buscar.")
+            notificacionViewModel.agregar("Publicación creada", "Tu oferta ya aparece en Inicio y en Buscar.")
+        }
+    }
 
 
     val titulos = listOf("Inicio", "Buscar", "Mensajes", "Perfil")
@@ -119,7 +146,7 @@ fun Home(
                         }
                         PanelNotificaciones(
                             expandido = mostrarNotificaciones,
-                            notificaciones = notificacionViewModel.notificaciones,
+                            notificaciones = notificaciones,
                             onCerrar = { mostrarNotificaciones = false }
                         )
                     }
