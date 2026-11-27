@@ -17,7 +17,7 @@ object Notificador {
 
     private const val CANAL_ID = "agricolab_avisos"
 
-    // En Android 8 o superior toda notificación necesita un canal
+    // Las notificaciones necesitan un canal
     private fun crearCanal(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val canal = NotificationChannel(
@@ -30,7 +30,7 @@ object Notificador {
         }
     }
 
-    // En Android 13 o superior el usuario debe aceptar el permiso
+    // El usuario debe aceptar el permiso
     fun tienePermiso(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
         return ContextCompat.checkSelfPermission(

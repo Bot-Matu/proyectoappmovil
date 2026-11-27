@@ -174,7 +174,7 @@ class PublicacionViewModelTest {
             guardadas.value = guardadas.value.filter { it.id in ids }
         }
 
-        // Estos dos no se usan en las pruebas, pero la interfaz los exige
+
         override suspend fun update(publicacion: Publicacion) {}
 
         override suspend fun delete(publicacion: Publicacion) {}
